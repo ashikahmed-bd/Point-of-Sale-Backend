@@ -14,20 +14,23 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
-            $table->ulid('parent_id')->nullable();
+            $table->foreignUlid('parent_id')
+                ->nullable()
+                ->constrained('categories')
+                ->nullOnDelete();
 
             $table->string('name');
             $table->string('slug')->unique();
 
             $table->text('description')->nullable();
             $table->string('image')->nullable();
+            $table->string('disk')->default(config('filesystems.default'));
 
             $table->unsignedInteger('sort_order')->default(0);
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();
             $table->softDeletes();
-            $table->timestamps();
         });
     }
 

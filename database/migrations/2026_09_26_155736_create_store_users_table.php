@@ -12,13 +12,20 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('store_users', function (Blueprint $table) {
-            $table->id();
-            $table->foreignUlid('user_id')->constrained()->cascadeOnDelete();
+            
+            $table->foreignUlid('store_id')
+                ->constrained()
+                ->cascadeOnDelete();
+
+            $table->foreignUlid('user_id')
+                ->constrained()
+                ->cascadeOnDelete();
 
             $table->string('role')->default('staff');
-            $table->boolean('is_active')->default(true);
-
+           
             $table->timestamps();
+
+            $table->primary(['store_id', 'user_id']);
         });
     }
 

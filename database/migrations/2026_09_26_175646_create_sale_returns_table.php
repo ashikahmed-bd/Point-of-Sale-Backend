@@ -16,7 +16,7 @@ return new class extends Migration
 
             $table->foreignUlid('store_id')->constrained()->cascadeOnDelete();
             $table->foreignUlid('sale_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('customer_id')->constrained()->nullOnDelete();
+            $table->foreignUlid('customer_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('return_no')->unique();
 
@@ -30,7 +30,7 @@ return new class extends Migration
 
             $table->string('status')->default('completed');
 
-            $table->foreignId('created_by')->nullable()
+            $table->foreignUlid('created_by')->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 

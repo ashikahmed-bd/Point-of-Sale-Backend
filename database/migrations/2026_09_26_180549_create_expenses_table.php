@@ -27,14 +27,12 @@ return new class extends Migration
 
             $table->text('description')->nullable();
 
-            $table->foreignId('created_by')->nullable()
+            $table->foreignUlid('created_by')->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 
             $table->timestamps();
             $table->softDeletes();
-
-            $table->timestamps();
         });
     }
 

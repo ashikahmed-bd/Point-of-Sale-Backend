@@ -34,7 +34,7 @@ return new class extends Migration
 
             $table->text('note')->nullable();
 
-            $table->foreignId('created_by')->nullable()
+            $table->foreignUlid('created_by')->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 

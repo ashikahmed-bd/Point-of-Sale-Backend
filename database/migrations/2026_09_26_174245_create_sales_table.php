@@ -15,7 +15,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
 
             $table->foreignUlid('store_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('customer_id')->constrained()->nullOnDelete();
+            $table->foreignUlid('customer_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignUlid('account_id')->constrained()->restrictOnDelete();
 
             $table->string('invoice_no')->unique();

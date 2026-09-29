@@ -30,6 +30,8 @@ return new class extends Migration
             $table->unsignedInteger('min_stock')->default(0);
 
             $table->string('image')->nullable();
+            $table->string('disk')->default(config('filesystems.default'));
+
 
             $table->string('status')->default('active');
 

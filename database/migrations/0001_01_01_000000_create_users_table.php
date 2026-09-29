@@ -17,6 +17,18 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            $table->date('birthday')->nullable();
+            $table->enum('gender', ['male', 'female', 'other'])->nullable();
+
+            $table->enum('role', ['owner', 'admin', 'manager', 'cashier', 'salesman', 'accountant', 'inventory',])->default('cashier');
+
+            $table->boolean('disabled')->default(false);
+
+            $table->string('disk')->default(config('filesystems.default'));
+
+            $table->timestamp('last_seen_at')->nullable();
+
             $table->rememberToken();
             $table->timestamps();
         });

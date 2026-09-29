@@ -37,13 +37,15 @@ return new class extends Migration
 
             $table->string('image')->nullable();
             $table->json('gallery')->nullable();
+            $table->string('disk')->default(config('filesystems.default'));
+
 
             $table->foreignUlid('category_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('brand_id')->constrained()->nullOnDelete();
-            $table->foreignUlid('tax_id')->constrained()->nullOnDelete();
+            $table->foreignUlid('brand_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignUlid('tax_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignUlid('unit_id')->constrained()->restrictOnDelete();
 
-            $table->foreignId('created_by')->nullable()
+            $table->foreignUlid('created_by')->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
 
