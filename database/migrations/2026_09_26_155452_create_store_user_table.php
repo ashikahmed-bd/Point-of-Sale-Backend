@@ -11,21 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('store_users', function (Blueprint $table) {
-            
+        Schema::create('store_user', function (Blueprint $table) {
+
             $table->foreignUlid('store_id')
-                ->constrained()
+                ->constrained('stores')
                 ->cascadeOnDelete();
 
             $table->foreignUlid('user_id')
-                ->constrained()
+                ->constrained('users')
                 ->cascadeOnDelete();
 
-            $table->string('role')->default('staff');
-           
+            $table->enum('role', [
+                'owner',
+                'admin',
+                'manager',
+                'cashier',
+                'salesman',
+                'accountant',
+                'inventory',
+            ])->default('cashier');
+
+            $table->boolean('is_active')->default(true);
+
             $table->timestamps();
 
-            $table->primary(['store_id', 'user_id']);
+            $table->unique(['store_id', 'user_id']);
         });
     }
 

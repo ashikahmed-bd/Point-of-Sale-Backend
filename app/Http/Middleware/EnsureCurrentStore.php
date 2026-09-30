@@ -33,6 +33,8 @@ class EnsureCurrentStore
 
         $store = $user->stores()
             ->where('stores.id', $storeId)
+            ->where('stores.is_active', true)
+            ->wherePivot('is_active', true)
             ->first();
 
         if (!$store) {
@@ -44,7 +46,7 @@ class EnsureCurrentStore
         app()->instance('currentStore', $store);
 
         $request->attributes->set('current_store', $store);
-        
+
         return $next($request);
     }
 }

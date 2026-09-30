@@ -22,54 +22,57 @@ use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 
-Route::prefix('v1')->group(function () {
+Route::prefix('auth')->group(function () {
+    Route::post('login', [AuthController::class, 'login']);
+    Route::post('register', [AuthController::class, 'register']);
 
-    Route::prefix('auth')->group(function () {
-        Route::post('login', [AuthController::class, 'login']);
-        Route::post('register', [AuthController::class, 'register']);
-
-        Route::middleware('auth:sanctum')->group(function () {
-            Route::get('user', [AuthController::class, 'user']);
-            Route::post('logout', [AuthController::class, 'logout']);
-            Route::post('refresh', [AuthController::class, 'refresh']);
-        });
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('user', [AuthController::class, 'user']);
+        Route::post('logout', [AuthController::class, 'logout']);
+        Route::post('refresh', [AuthController::class, 'refresh']);
     });
+});
 
 
-    Route::middleware(['auth:sanctum','store'])->group(function () {
-        Route::apiResource('users', UserController::class);
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::apiResource('users', UserController::class);
 
-        Route::apiResource('stores', StoreController::class);
+    Route::apiResource('stores', StoreController::class);
 
-        Route::get('settings', [SettingController::class, 'index']);
-        Route::put('settings', [SettingController::class, 'update']);
+    Route::get('settings', [SettingController::class, 'index']);
+    Route::put('settings', [SettingController::class, 'update']);
 
-        Route::apiResource('logs', LogController::class)->only(['index', 'show']);
+    Route::apiResource('logs', LogController::class)->only(['index', 'show']);
 
-        Route::apiResource('accounts', AccountController::class);
-        Route::apiResource('transactions', TransactionController::class);
-        Route::apiResource('payments', PaymentController::class);
-        Route::apiResource('expenses', ExpenseController::class);
+    Route::apiResource('accounts', AccountController::class);
+    Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('payments', PaymentController::class);
+    Route::apiResource('expenses', ExpenseController::class);
 
-        Route::apiResource('sales', SaleController::class);
-        Route::apiResource('purchases', PurchaseController::class);
+    Route::apiResource('sales', SaleController::class);
+    Route::apiResource('purchases', PurchaseController::class);
+
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('brands', BrandController::class);
+    Route::apiResource('units', UnitController::class);
+
+    Route::get('products', [ProductController::class, 'index',]);
+    Route::post('products', [ProductController::class, 'store',]);
+    Route::get('products/{product}', [ProductController::class, 'show',]);
+    Route::put('products/{product}', [ProductController::class, 'update',]);
+    Route::delete('products/{product}', [ProductController::class, 'destroy',]);
+    Route::post('products/{product}/media', [ProductController::class, 'media',]);
 
 
+    Route::apiResource('variants', VariantController::class);
+    Route::apiResource('warehouses', WarehouseController::class);
 
-        Route::apiResource('products', ProductController::class);
-        Route::apiResource('categories', CategoryController::class);
-        Route::apiResource('brands', BrandController::class);
-        Route::apiResource('units', UnitController::class);
-        Route::apiResource('variants', VariantController::class);
-        Route::apiResource('warehouses', WarehouseController::class);
-
-        Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('suppliers', SupplierController::class);
 
 
-        Route::prefix('reports')->group(function () {
-            Route::get('accounts', [ReportController::class, 'index']);
-            Route::get('accounts/summary', [ReportController::class, 'summary']);
-            Route::get('accounts/transactions', [ReportController::class, 'transactions']);
-        });
+    Route::prefix('reports')->group(function () {
+        Route::get('accounts', [ReportController::class, 'index']);
+        Route::get('accounts/summary', [ReportController::class, 'summary']);
+        Route::get('accounts/transactions', [ReportController::class, 'transactions']);
     });
 });

@@ -26,12 +26,6 @@ return new class extends Migration
             $table->string('postcode', 20)->nullable();
             $table->string('country', 100)->default('Bangladesh');
 
-            $table->string('logo')->nullable();
-
-            $table->string('currency', 10)->default('BDT');
-            $table->string('currency_symbol', 10)->default('৳');
-            $table->string('timezone')->default('Asia/Dhaka');
-
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();

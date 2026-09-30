@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Store extends Model
 {
@@ -13,10 +12,16 @@ class Store extends Model
     protected $guarded = [];
 
 
-    public function users(): BelongsToMany
+    public function users()
     {
         return $this->belongsToMany(User::class)
-            ->withPivot('role')
+            ->withPivot(['role', 'is_active'])
             ->withTimestamps();
+    }
+
+
+    public function accounts()
+    {
+        return $this->hasMany(Account::class);
     }
 }

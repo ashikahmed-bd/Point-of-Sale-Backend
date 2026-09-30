@@ -47,7 +47,6 @@ class AuthController extends Controller
                 'id' => $user->id,
                 'name' => $user->name,
                 'photo_url' => $user->photo_url,
-                'role' => $user->role,
                 'since' => $user->created_at?->format('M d, Y'),
             ]
         ]);

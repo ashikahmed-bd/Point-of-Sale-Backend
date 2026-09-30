@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Store;
 use Illuminate\Http\Request;
 
 class StoreController extends Controller
@@ -44,5 +45,26 @@ class StoreController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function switch(Request $request, Store $store)
+    {
+        $user = $request->user();
+
+        abort_unless(
+            $user->stores()
+                ->where('stores.id', $store->id)
+                ->wherePivot('is_active', true)
+                ->exists(),
+            403
+        );
+
+        session(['store_id' => $store->id]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Store switched successfully.',
+            'store' => $store,
+        ]);
     }
 }
