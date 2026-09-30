@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SaleResource;
 use App\Models\Log;
 use App\Models\Sale;
 use Illuminate\Http\Request;
@@ -11,9 +12,28 @@ class SaleController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $sales = Sale::query()
+            ->when($request->search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('invoice_no', 'like', "%{$search}%")
+                        ->orWhere('customer_name', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->status, function ($query, $status) {
+                $query->where('status', $status);
+            })
+            ->when($request->payment_status, function ($query, $status) {
+                $query->where('payment_status', $status);
+            })
+            ->when($request->payment_method, function ($query, $method) {
+                $query->where('payment_method', $method);
+            })
+            ->latest()
+            ->paginate($request->integer('limit', 20));
+
+        return SaleResource::collection($sales);
     }
 
     /**

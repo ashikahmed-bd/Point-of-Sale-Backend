@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LogController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\SaleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
+use App\Http\Controllers\TaxController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
@@ -35,6 +37,49 @@ Route::prefix('auth')->group(function () {
 
 
 Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::apiResource('categories', CategoryController::class);
+    Route::apiResource('brands', BrandController::class);
+    Route::apiResource('units', UnitController::class);
+    Route::apiResource('taxes', TaxController::class);
+
+    Route::apiResource('products', ProductController::class);
+    Route::post('products/{product}/media', [ProductController::class, 'media']);
+
+    Route::prefix('cart')->group(function () {
+        Route::get('/', [CartController::class, 'index']);
+        Route::post('/items', [CartController::class, 'store']);
+        Route::put('/items/{item}', [CartController::class, 'update']);
+        Route::post('/items/{item}/increment', [CartController::class, 'increment']);
+        Route::post('/items/{item}/decrement', [CartController::class, 'decrement']);
+        Route::delete('/items/{item}', [CartController::class, 'destroy']);
+        Route::delete('/', [CartController::class, 'clear']);
+        Route::post('/discount', [CartController::class, 'discount']);
+        Route::post('/tax', [CartController::class, 'tax']);
+        Route::post('/shipping', [CartController::class, 'shipping']);
+    });
+
+    Route::apiResource('sales', SaleController::class);
+
+    Route::apiResource('accounts', AccountController::class);
+    Route::apiResource('transactions', TransactionController::class);
+    Route::apiResource('payments', PaymentController::class);
+    Route::apiResource('expenses', ExpenseController::class);
+
+
+    Route::apiResource('purchases', PurchaseController::class);
+
+    Route::apiResource('variants', VariantController::class);
+    Route::apiResource('warehouses', WarehouseController::class);
+
+    Route::apiResource('suppliers', SupplierController::class);
+
+    Route::prefix('reports')->group(function () {
+        Route::get('accounts', [ReportController::class, 'index']);
+        Route::get('accounts/summary', [ReportController::class, 'summary']);
+        Route::get('accounts/transactions', [ReportController::class, 'transactions']);
+    });
+
     Route::apiResource('users', UserController::class);
 
     Route::apiResource('stores', StoreController::class);
@@ -43,36 +88,4 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('settings', [SettingController::class, 'update']);
 
     Route::apiResource('logs', LogController::class)->only(['index', 'show']);
-
-    Route::apiResource('accounts', AccountController::class);
-    Route::apiResource('transactions', TransactionController::class);
-    Route::apiResource('payments', PaymentController::class);
-    Route::apiResource('expenses', ExpenseController::class);
-
-    Route::apiResource('sales', SaleController::class);
-    Route::apiResource('purchases', PurchaseController::class);
-
-    Route::apiResource('categories', CategoryController::class);
-    Route::apiResource('brands', BrandController::class);
-    Route::apiResource('units', UnitController::class);
-
-    Route::get('products', [ProductController::class, 'index',]);
-    Route::post('products', [ProductController::class, 'store',]);
-    Route::get('products/{product}', [ProductController::class, 'show',]);
-    Route::put('products/{product}', [ProductController::class, 'update',]);
-    Route::delete('products/{product}', [ProductController::class, 'destroy',]);
-    Route::post('products/{product}/media', [ProductController::class, 'media',]);
-
-
-    Route::apiResource('variants', VariantController::class);
-    Route::apiResource('warehouses', WarehouseController::class);
-
-    Route::apiResource('suppliers', SupplierController::class);
-
-
-    Route::prefix('reports')->group(function () {
-        Route::get('accounts', [ReportController::class, 'index']);
-        Route::get('accounts/summary', [ReportController::class, 'summary']);
-        Route::get('accounts/transactions', [ReportController::class, 'transactions']);
-    });
 });
