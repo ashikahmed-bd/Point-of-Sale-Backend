@@ -122,6 +122,7 @@ class ProductSeeder extends Seeder
 
         foreach ($products as $product) {
             Product::query()->create(array_merge($product, [
+                'code' => fake()->unique()->numerify('100#####'),
                 'category_id' => fake()->randomElement(Category::query()->pluck('id')->toArray()),
                 'brand_id' => fake()->randomElement(Brand::query()->pluck('id')->toArray()),
                 'tax_id' => fake()->randomElement(Tax::query()->pluck('id')->toArray()),

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->ulid('id')->primary();
+            $table->string('code', 10)->unique();
 
             $table->string('name');
             $table->string('slug')->unique();
@@ -26,16 +27,16 @@ return new class extends Migration
             $table->decimal('selling_price', 15, 2)->default(0);
             $table->decimal('compare_price', 15, 2)->nullable();
 
+            $table->unsignedInteger('stock')->default(0);
             $table->unsignedInteger('min_stock')->default(0);
             $table->unsignedInteger('max_stock')->nullable();
-
             $table->boolean('track_stock')->default(true);
+
             $table->boolean('allow_backorder')->default(false);
-            $table->boolean('has_variants')->default(false);
 
             $table->string('status')->default('active');
 
-            $table->string('image')->nullable();
+            $table->string('cover')->nullable();
             $table->json('gallery')->nullable();
             $table->string('disk')->default(config('filesystems.default'));
 

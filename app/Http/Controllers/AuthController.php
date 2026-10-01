@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
@@ -74,5 +75,12 @@ class AuthController extends Controller
     public function reset(Request $request)
     {
         //
+    }
+
+
+    public function user(Request $request)
+    {
+        $user = $request->user();
+        return UserResource::make($user);
     }
 }

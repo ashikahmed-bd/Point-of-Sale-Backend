@@ -15,7 +15,7 @@ return new class extends Migration
             $table->ulid('id')->primary();
 
             $table->foreignUlid('store_id')->constrained()->cascadeOnDelete();
-            $table->foreignUlid('category_id')->constrained()->restrictOnDelete();
+            $table->foreignUlid('category_id')->constrained('expense_categories')->restrictOnDelete();
 
             $table->string('expense_no')->unique();
 

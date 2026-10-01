@@ -10,4 +10,8 @@ class ExpenseCategory extends Model
     use HasUlids;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+    ];
 }

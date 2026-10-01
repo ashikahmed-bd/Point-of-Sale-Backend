@@ -61,18 +61,14 @@ class ProductController extends Controller
             'selling_price' => $request->selling_price,
             'compare_price' => $request->compare_price,
 
+            'stock' => $request->stock,
             'min_stock' => $request->min_stock ?? 0,
             'max_stock' => $request->max_stock,
 
             'track_stock' => $request->track_stock ?? true,
             'allow_backorder' => $request->allow_backorder ?? false,
-            'has_variants' => $request->has_variants ?? false,
 
             'status' => $request->status ?? 'active',
-
-            'image' => $request->image,
-            'gallery' => $request->gallery,
-            'disk' => config('filesystems.default'),
 
             'category_id' => $request->category_id,
             'brand_id' => $request->brand_id,
@@ -81,6 +77,26 @@ class ProductController extends Controller
 
             'created_by' => $request->user()?->id,
         ]);
+
+        if ($request->hasFile('cover')) {
+            $path = $request->file('cover')->store('products', config('filesystems.default'));
+
+            $product->update([
+                'cover' => $path,
+                'disk' => config('filesystems.default'),
+            ]);
+        }
+
+        if ($request->hasFile('gallery')) {
+            $gallery = collect($request->file('gallery'))
+                ->map(fn($file) => $file->store('gallery', config('filesystems.default')))
+                ->values()
+                ->toArray();
+
+            $product->update([
+                'gallery' => $gallery,
+            ]);
+        }
 
         return ProductResource::make($product->fresh())->additional([
             'success' => true,

@@ -1,10 +1,13 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\PaymentController;
@@ -38,6 +41,8 @@ Route::prefix('auth')->group(function () {
 
 Route::middleware(['auth:sanctum'])->group(function () {
 
+    Route::get('dashboard', [AppController::class, 'dashboard']);
+
     Route::apiResource('categories', CategoryController::class);
     Route::apiResource('brands', BrandController::class);
     Route::apiResource('units', UnitController::class);
@@ -59,20 +64,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/shipping', [CartController::class, 'shipping']);
     });
 
-    Route::apiResource('sales', SaleController::class);
 
     Route::apiResource('accounts', AccountController::class);
     Route::apiResource('transactions', TransactionController::class);
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('expenses', ExpenseController::class);
 
-
     Route::apiResource('purchases', PurchaseController::class);
 
     Route::apiResource('variants', VariantController::class);
     Route::apiResource('warehouses', WarehouseController::class);
 
+    Route::apiResource('sales', SaleController::class);
+
     Route::apiResource('suppliers', SupplierController::class);
+    Route::apiResource('customers', CustomerController::class);
+
+    Route::apiResource('expense-categories', ExpenseCategoryController::class);
+    Route::apiResource('expenses', ExpenseController::class);
 
     Route::prefix('reports')->group(function () {
         Route::get('accounts', [ReportController::class, 'index']);

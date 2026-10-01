@@ -10,4 +10,10 @@ class Customer extends Model
     use HasUlids;
 
     protected $guarded = [];
+
+    protected $casts = [
+        'opening_balance' => 'decimal:2',
+        'credit_limit' => 'decimal:2',
+        'is_active' => 'boolean',
+    ];
 }

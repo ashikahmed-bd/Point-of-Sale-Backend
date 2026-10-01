@@ -45,4 +45,53 @@ class Product extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function variants()
+    {
+        return $this->hasMany(Variant::class, 'product_id');
+    }
+
+    public function getOptionsAttribute()
+    {
+        $variants = $this->relationLoaded('variants')
+            ? $this->variants
+            : $this->variants()->get();
+
+        return collect($this->variants ?? [])
+            ->flatMap(function ($variant) {
+                return collect($variant->options ?? [])
+                    ->map(function ($value, $name) {
+                        return [
+                            'name' => $name,
+                            'value' => $value,
+                        ];
+                    });
+            })
+            ->groupBy('name')
+            ->sortKeys()
+            ->map(function ($items, $name) {
+                return [
+                    'name' => $name,
+                    'options' => $items
+                        ->pluck('value')
+                        ->unique()
+                        ->sort()
+                        ->values()
+                        ->all(),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    protected static function booted(): void
+    {
+        static::creating(function ($product) {
+            do {
+                $code = str()->padLeft((string) random_int(1, 9999999), 7, '0');
+            } while (static::where('code', $code)->exists());
+
+            $product->code = $code;
+        });
+    }
 }
