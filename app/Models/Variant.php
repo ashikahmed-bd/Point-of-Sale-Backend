@@ -27,6 +27,11 @@ class Variant extends Model
         return $this->belongsTo(Product::class);
     }
 
+    public function options()
+    {
+        return $this->hasMany(VariantOption::class);
+    }
+
     protected static function booted(): void
     {
         static::creating(function (Variant $variant) {

@@ -10,4 +10,19 @@ class Attribute extends Model
     use HasUlids;
 
     protected $guarded = [];
+
+    public function options()
+    {
+        return $this->hasMany(AttributeOption::class);
+    }
+
+    public function productOptions()
+    {
+        return $this->hasMany(ProductOption::class);
+    }
+
+    public function variantOptions()
+    {
+        return $this->hasMany(VariantOption::class);
+    }
 }

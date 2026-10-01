@@ -11,17 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('variants', function (Blueprint $table) {
             $table->ulid('id')->primary();
-            $table->string('code', 10)->unique();
+
+            $table->foreignUlid('product_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
-            $table->string('slug')->unique();
 
             $table->string('sku')->unique();
             $table->string('barcode')->nullable()->unique();
 
-            $table->text('description')->nullable();
+            // Example:
+            // {"color":"Black","size":"L","type":"Home"}
+            $table->json('options')->nullable();
 
             $table->decimal('cost_price', 15, 2)->default(0);
             $table->decimal('selling_price', 15, 2)->default(0);
@@ -30,26 +32,15 @@ return new class extends Migration
             $table->unsignedInteger('stock')->default(0);
             $table->unsignedInteger('min_stock')->default(0);
             $table->unsignedInteger('max_stock')->nullable();
-            $table->boolean('track_stock')->default(true);
 
+            $table->boolean('track_stock')->default(true);
             $table->boolean('allow_backorder')->default(false);
 
-            $table->boolean('has_variants')->default(false);
-            $table->string('status')->default('active');
-
-            $table->string('cover')->nullable();
-            $table->json('gallery')->nullable();
+            $table->string('image')->nullable();
             $table->string('disk')->default(config('filesystems.default'));
 
-
-            $table->foreignUlid('category_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('brand_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignUlid('tax_id')->nullable()->constrained()->nullOnDelete();
-            $table->foreignUlid('unit_id')->constrained()->restrictOnDelete();
-
-            $table->foreignUlid('created_by')->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->boolean('is_default')->default(false);
+            $table->boolean('active')->default(true);
 
             $table->timestamps();
             $table->softDeletes();
@@ -61,6 +52,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('variants');
     }
 };
