@@ -86,4 +86,20 @@ class TaxController extends Controller
             'message' => 'Tax deleted successfully.',
         ]);
     }
+
+
+    public function search(Request $request)
+    {
+        $taxes = Tax::query()
+            ->select('id', 'name', 'rate', 'type')
+            ->where('is_active', true)
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return TaxResource::collection($taxes);
+    }
 }

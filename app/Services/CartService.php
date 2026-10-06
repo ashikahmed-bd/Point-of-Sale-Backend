@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\Variant;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -17,11 +16,10 @@ class CartService
      */
     private function cart(): Cart
     {
+        $token = request()->header('X-Cart-Token') ?: (string) Str::uuid();
+
         return Cart::firstOrCreate(
-            [
-                'token' => request()->header('X-Cart-Token')
-                    ?? (string) Str::uuid(),
-            ],
+            ['token' => $token],
             [
                 'subtotal' => 0,
                 'discount' => 0,
@@ -44,45 +42,22 @@ class CartService
     /**
      * Add product to cart.
      */
-    public function add(
-        string $product_id,
-        ?string $variant_id,
-        int $quantity
-    ): Cart {
+    public function add(string $product_id, int $quantity): Cart
+    {
         if ($quantity < 1) {
             throw new InvalidArgumentException(
                 'Quantity must be at least 1.'
             );
         }
 
-        return DB::transaction(function () use (
-            $product_id,
-            $variant_id,
-            $quantity
-        ) {
+        return DB::transaction(function () use ($product_id, $quantity) {
             $cart = $this->cart();
 
             $product = Product::query()
                 ->with('tax')
                 ->findOrFail($product_id);
 
-            $variant = null;
-
-            if ($variant_id) {
-                $variant = Variant::query()
-                    ->whereKey($variant_id)
-                    ->where('product_id', $product->id)
-                    ->firstOrFail();
-            }
-
-            $price = $variant?->price
-                ?? $product->selling_price;
-
-            if ($price === null) {
-                throw new InvalidArgumentException(
-                    'Product price is not available.'
-                );
-            }
+            $price = (float) $product->price;
 
             $taxRate = $product->tax?->is_active
                 ? (float) $product->tax->rate
@@ -90,32 +65,21 @@ class CartService
 
             $item = $cart->items()
                 ->where('product_id', $product->id)
-                ->where('variant_id', $variant?->id)
                 ->first();
 
             if ($item) {
                 $item->quantity += $quantity;
-
                 $item->tax_rate = $taxRate;
-
-                $item->total =
-                    $item->price * $item->quantity;
-
+                $item->total = $item->price * $item->quantity;
                 $item->save();
             } else {
                 $cart->items()->create([
                     'product_id' => $product->id,
-                    'variant_id' => $variant?->id,
-
                     'name' => $product->name,
-                    'sku' => $variant?->sku
-                        ?? $product->sku,
-
+                    'sku' => $product->sku,
                     'price' => $price,
                     'quantity' => $quantity,
-
                     'tax_rate' => $taxRate,
-
                     'total' => $price * $quantity,
                 ]);
             }
@@ -124,7 +88,6 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
-
                 'total' => max(
                     $subtotal
                         - $cart->discount
@@ -134,9 +97,7 @@ class CartService
                 ),
             ]);
 
-            return $cart
-                ->refresh()
-                ->load('items');
+            return $cart->refresh()->load('items');
         });
     }
 
@@ -346,7 +307,7 @@ class CartService
     /**
      * Set discount.
      */
-    public function discount(float $discount): Cart
+    public function discount(float $discount, string $type): Cart
     {
         if ($discount < 0) {
             throw new InvalidArgumentException(
@@ -356,56 +317,18 @@ class CartService
 
         $cart = $this->cart();
 
-        $cart->update([
-            'discount' => $discount,
-        ]);
+        $discount = $type === 'percent'
+            ? ($cart->subtotal * $discount) / 100
+            : $discount;
 
-        $cart->update([
-            'total' => max(
-                $cart->subtotal
-                    - $cart->discount
-                    + $cart->tax
-                    + $cart->shipping,
-                0
-            ),
-        ]);
+        $discount = min($discount, $cart->subtotal);
 
-        return $cart
-            ->refresh()
-            ->load('items');
+        $cart->discount = $discount;
+        $cart->save();
+
+        return $cart->refresh()->load('items');
     }
 
-    /**
-     * Set tax.
-     */
-    public function tax(float $tax): Cart
-    {
-        if ($tax < 0) {
-            throw new InvalidArgumentException(
-                'Tax cannot be negative.'
-            );
-        }
-
-        $cart = $this->cart();
-
-        $cart->update([
-            'tax' => $tax,
-        ]);
-
-        $cart->update([
-            'total' => max(
-                $cart->subtotal
-                    - $cart->discount
-                    + $cart->tax
-                    + $cart->shipping,
-                0
-            ),
-        ]);
-
-        return $cart
-            ->refresh()
-            ->load('items');
-    }
 
     /**
      * Set shipping.
@@ -420,23 +343,10 @@ class CartService
 
         $cart = $this->cart();
 
-        $cart->update([
-            'shipping' => $shipping,
-        ]);
+        $cart->shipping = $shipping;
+        $cart->save();
 
-        $cart->update([
-            'total' => max(
-                $cart->subtotal
-                    - $cart->discount
-                    + $cart->tax
-                    + $cart->shipping,
-                0
-            ),
-        ]);
-
-        return $cart
-            ->refresh()
-            ->load('items');
+        return $cart->refresh()->load('items');
     }
 
     /**

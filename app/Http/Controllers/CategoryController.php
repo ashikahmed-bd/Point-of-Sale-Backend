@@ -133,4 +133,19 @@ class CategoryController extends Controller
             'message' => 'Category deleted successfully.',
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $categories = Category::query()
+            ->select('id', 'name')
+            ->where('is_active', true)
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return CategoryResource::collection($categories);
+    }
 }

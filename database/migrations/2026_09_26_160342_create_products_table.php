@@ -24,8 +24,9 @@ return new class extends Migration
             $table->text('description')->nullable();
 
             $table->decimal('cost_price', 15, 2)->default(0);
-            $table->decimal('selling_price', 15, 2)->default(0);
-            $table->decimal('compare_price', 15, 2)->nullable();
+            $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('base_price', 15, 2)->nullable();
+            $table->char('currency', 3)->default(config('app.currency'));
 
             $table->unsignedInteger('stock')->default(0);
             $table->unsignedInteger('min_stock')->default(0);

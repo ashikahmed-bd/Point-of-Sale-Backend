@@ -15,7 +15,7 @@ class Store extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)
-            ->withPivot(['role', 'is_active'])
+            ->withPivot(['role', 'is_default', 'is_active'])
             ->withTimestamps();
     }
 

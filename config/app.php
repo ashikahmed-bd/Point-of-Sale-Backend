@@ -4,6 +4,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Application Currency
+    |--------------------------------------------------------------------------
+    |
+    | This value defines the default currency used throughout the application
+    | for prices, sales, purchases, expenses, reports, and other monetary
+    | transactions. The currency can be configured using the APP_CURRENCY
+    | environment variable. BDT is used as the default currency.
+    |
+    */
+
+    'currency' => env('APP_CURRENCY', 'BDT'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Name
     |--------------------------------------------------------------------------
     |

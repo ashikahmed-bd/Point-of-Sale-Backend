@@ -113,4 +113,20 @@ class BrandController extends Controller
             'message' => 'Brand deleted successfully.',
         ]);
     }
+
+
+    public function search(Request $request)
+    {
+        $brands = Brand::query()
+            ->select('id', 'name')
+            ->where('is_active', true)
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return BrandResource::collection($brands);
+    }
 }

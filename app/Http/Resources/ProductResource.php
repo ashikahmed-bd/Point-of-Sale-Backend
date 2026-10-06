@@ -29,8 +29,9 @@ class ProductResource extends JsonResource
             'description' => $this->description,
 
             'cost_price' => $this->cost_price,
-            'selling_price' => $this->selling_price,
-            'compare_price' => $this->compare_price,
+            'price' => $this->price,
+            'base_price' => $this->base_price,
+            'currency' => $this->currency,
 
             'stock' => $this->stock,
             'min_stock' => $this->min_stock,
@@ -42,8 +43,8 @@ class ProductResource extends JsonResource
             'has_variants' => $this->has_variants,
             'status' => $this->status,
 
-            'cover' => $this->cover,
-            'gallery' => $this->gallery,
+            'cover_url' => $this->cover_url,
+            'gallery_url' => $this->gallery_url,
 
             'category' => $this->whenLoaded('category', fn() => [
                 'id'   => $this->category->id,

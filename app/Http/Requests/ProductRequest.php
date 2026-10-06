@@ -56,6 +56,7 @@ class ProductRequest extends FormRequest
         $this->merge([
             'track_stock' => $this->boolean('track_stock', true),
             'allow_backorder' => $this->boolean('allow_backorder', false),
+            'has_variants' => $this->boolean('has_variants', false),
         ]);
     }
 }

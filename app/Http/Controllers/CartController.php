@@ -31,7 +31,6 @@ class CartController extends Controller
 
         $cart = $cart->add(
             $request->product_id,
-            $request->variant_id,
             $request->quantity
         );
 
@@ -131,45 +130,20 @@ class CartController extends Controller
     public function discount(Request $request)
     {
         $request->validate([
-            'discount' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
+            'amount' => ['required', 'numeric', 'min:0'],
+            'type' => ['required', 'in:percent,fixed'],
         ]);
 
         $cart = app(CartService::class);
 
         $cart = $cart->discount(
-            $request->input('discount')
+            $request->input('amount'),
+            $request->input('type')
         );
 
         return CartResource::make($cart)->additional([
             'success' => true,
             'message' => 'Discount updated successfully.',
-        ]);
-    }
-
-
-    public function tax(Request $request)
-    {
-        $request->validate([
-            'tax' => [
-                'required',
-                'numeric',
-                'min:0',
-            ],
-        ]);
-
-        $cart = app(CartService::class);
-
-        $cart = $cart->tax(
-            $request->input('tax')
-        );
-
-        return CartResource::make($cart)->additional([
-            'success' => true,
-            'message' => 'Tax updated successfully.',
         ]);
     }
 

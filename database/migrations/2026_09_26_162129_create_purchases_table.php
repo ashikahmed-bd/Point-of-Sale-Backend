@@ -30,6 +30,8 @@ return new class extends Migration
             $table->decimal('paid_amount', 15, 2)->default(0);
             $table->decimal('due_amount', 15, 2)->default(0);
 
+            $table->char('currency', 3)->default(config('app.currency'));
+
             $table->string('status')->default('received');
 
             $table->text('note')->nullable();

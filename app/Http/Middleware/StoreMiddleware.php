@@ -2,11 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Store;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class EnsureCurrentStore
+class StoreMiddleware
 {
     /**
      * Handle an incoming request.
@@ -15,26 +16,18 @@ class EnsureCurrentStore
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = $request->user();
-
-        if (!$user) {
-            return response()->json([
-                'message' => 'Unauthenticated.',
-            ], 401);
-        }
-
         $storeId = $request->header('X-Store-ID');
 
         if (!$storeId) {
             return response()->json([
                 'message' => 'Store is required.',
-            ], 400);
+            ], 422);
         }
 
-        $store = $user->stores()
+        $store = $request->user()
+            ->stores()
             ->where('stores.id', $storeId)
             ->where('stores.is_active', true)
-            ->wherePivot('is_active', true)
             ->first();
 
         if (!$store) {
@@ -43,8 +36,7 @@ class EnsureCurrentStore
             ], 403);
         }
 
-        $request->attributes->set('current_store', $store);
-
+        app()->instance(Store::class, $store);
 
         return $next($request);
     }

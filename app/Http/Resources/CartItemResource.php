@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class BrandResource extends JsonResource
+class CartItemResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,11 +18,18 @@ class BrandResource extends JsonResource
 
         return [
             'id' => $this->id,
+            'cart' => CartResource::make($this->whenLoaded('cart')),
+            'product' => ProductResource::make($this->whenLoaded('product')),
+            'variant' => VariantResource::make($this->whenLoaded('variant')),
+
             'name' => $this->name,
-            'slug' => $this->slug,
-            'logo_url' => $this->logo_url,
-            'description' => $this->description,
-            'is_active' => (bool) $this->is_active,
+            'sku' => $this->sku,
+
+            'price' => $this->price,
+            'quantity' => $this->quantity,
+            'tax_rate' => $this->tax_rate,
+            'total' => $this->total,
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

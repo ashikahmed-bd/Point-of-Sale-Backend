@@ -86,4 +86,20 @@ class UnitController extends Controller
             'message' => 'Unit deleted successfully.',
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $units = Unit::query()
+            ->select('id', 'name', 'short_name')
+            ->where('is_active', true)
+            ->when($request->search, function ($query, $search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('short_name', 'like', "%{$search}%");
+            })
+            ->orderBy('name')
+            ->limit(20)
+            ->get();
+
+        return UnitResource::collection($units);
+    }
 }

@@ -40,6 +40,21 @@ class AuthController extends Controller
             ], Response::HTTP_FORBIDDEN);
         }
 
+        $stores = $user->stores()
+            ->where('stores.is_active', true)
+            ->wherePivot('is_active', true)
+            ->get();
+
+        if ($stores->isEmpty()) {
+            Auth::logout();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'No active store is assigned to your account.',
+            ], Response::HTTP_FORBIDDEN);
+        }
+
+
         return response()->json([
             'message' => 'You are logged in successfully!',
             'type' => 'Bearer',
@@ -49,7 +64,13 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'photo_url' => $user->photo_url,
                 'since' => $user->created_at?->format('M d, Y'),
-            ]
+            ],
+            'stores' => $stores->map(fn($store) => [
+                'id' => $store->id,
+                'name' => $store->name,
+                'code' => $store->code,
+                'default' => (bool) $store->pivot->is_default,
+            ]),
         ]);
     }
 

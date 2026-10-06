@@ -132,8 +132,8 @@ class ProductSeeder extends Seeder
                 'description' => fake()->sentence(12),
 
                 'cost_price' => fake()->randomFloat(2, 300, 1500),
-                'selling_price' => fake()->randomFloat(2, 500, 3000),
-                'compare_price' => fake()->randomFloat(2, 1000, 3500),
+                'price' => fake()->randomFloat(2, 500, 3000),
+                'base_price' => fake()->randomFloat(2, 1000, 3500),
 
                 'min_stock' => fake()->numberBetween(2, 10),
                 'max_stock' => fake()->numberBetween(20, 100),

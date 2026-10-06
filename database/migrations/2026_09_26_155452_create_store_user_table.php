@@ -31,6 +31,7 @@ return new class extends Migration
                 'inventory',
             ])->default('cashier');
 
+            $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();

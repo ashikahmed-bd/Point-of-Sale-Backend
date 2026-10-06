@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('expense_no')->unique();
 
             $table->decimal('amount', 15, 2);
+            $table->char('currency', 3)->default(config('app.currency'));
 
             $table->dateTime('expense_date');
 

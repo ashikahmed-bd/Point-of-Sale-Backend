@@ -30,8 +30,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('sku')->nullable();
 
-            $table->decimal('price', 15, 2);
-            $table->decimal('quantity', 15, 2)->default(1);
+            $table->decimal('price', 15, 2)->default(0);
+            $table->unsignedInteger('quantity')->default(1);
+
+            $table->decimal('tax_rate', 10, 2)->default(0);
+            $table->decimal('tax', 15, 2)->default(0);
+            $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('total', 15, 2)->default(0);
 
             $table->timestamps();

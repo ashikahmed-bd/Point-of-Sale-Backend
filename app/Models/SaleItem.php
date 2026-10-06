@@ -12,13 +12,13 @@ class SaleItem extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'quantity' => 'decimal:3',
-
-        'unit_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
-
+        'price' => 'decimal:2',
+        'quantity' => 'decimal:3',
         'discount' => 'decimal:2',
+        'tax_rate' => 'decimal:2',
         'tax' => 'decimal:2',
+        'subtotal' => 'decimal:2',
         'total' => 'decimal:2',
     ];
 

@@ -20,20 +20,20 @@ return new class extends Migration
 
             $table->string('invoice_no')->unique();
 
-            $table->dateTime('sale_date');
-
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('shipping', 15, 2)->default(0);
-            $table->decimal('rounding', 15, 2)->default(0);
-
             $table->decimal('total', 15, 2)->default(0);
 
-            $table->decimal('paid_amount', 15, 2)->default(0);
+            $table->decimal('payable', 15, 2)->default(0);
+            $table->decimal('change_amount', 15, 2)->default(0);
             $table->decimal('due_amount', 15, 2)->default(0);
 
-            $table->string('payment_status')->default('paid');
+            $table->char('currency', 3)->default(config('app.currency'));
+
+            $table->string('payment')->default('paid');
+            $table->string('method')->default('cash');
             $table->string('status')->default('completed');
 
             $table->text('note')->nullable();

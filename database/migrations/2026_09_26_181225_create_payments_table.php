@@ -29,6 +29,7 @@ return new class extends Migration
             $table->string('type'); // payment, refund
 
             $table->decimal('amount', 15, 2);
+            $table->char('currency', 3)->default(config('app.currency'));
 
             $table->string('method'); // cash, bank, card, mobile_banking
 
@@ -42,7 +43,7 @@ return new class extends Migration
                 ->nullable()
                 ->constrained('users')
                 ->nullOnDelete();
-                
+
             $table->timestamps();
         });
     }

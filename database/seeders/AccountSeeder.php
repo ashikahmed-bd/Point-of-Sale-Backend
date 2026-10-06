@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Account;
 use App\Models\Store;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -28,6 +27,7 @@ class AccountSeeder extends Seeder
             'branch_name' => null,
             'opening_balance' => 0,
             'current_balance' => 0,
+            'is_default' => true,
             'active' => true,
             'note' => 'Main cash account',
         ]);

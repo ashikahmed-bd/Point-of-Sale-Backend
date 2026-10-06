@@ -35,12 +35,26 @@ class Cart extends Model
         return $this->belongsTo(Store::class);
     }
 
-    protected static function booted()
+    protected static function booted(): void
     {
-        static::creating(function ($cart) {
-            if (!$cart->token) {
-                $cart->token = (string) Str::uuid();
-            }
+        static::creating(function (Cart $cart) {
+            $cart->token ??= (string) Str::uuid();
+        });
+
+        static::saving(function (Cart $cart) {
+            $cart->subtotal = $cart->items()->sum('subtotal');
+            $cart->tax = $cart->items()->sum('tax');
+
+            $cart->discount = max(0, (float) $cart->discount);
+            $cart->shipping = max(0, (float) $cart->shipping);
+
+            $cart->total = max(
+                0,
+                $cart->subtotal
+                    + $cart->tax
+                    + $cart->shipping
+                    - $cart->discount
+            );
         });
     }
 }

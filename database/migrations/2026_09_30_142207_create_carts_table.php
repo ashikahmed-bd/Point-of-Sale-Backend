@@ -14,23 +14,16 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
-            $table->foreignUlid('store_id')
-                ->constrained()
-                ->cascadeOnDelete();
-
             $table->uuid('token')->unique();
-
-            $table->foreignUlid('customer_id')
-                ->nullable()
-                ->constrained()
-                ->nullOnDelete();
 
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
             $table->decimal('tax', 15, 2)->default(0);
             $table->decimal('shipping', 15, 2)->default(0);
             $table->decimal('total', 15, 2)->default(0);
-            
+
+            $table->char('currency', 3)->default(config('app.currency'));
+
             $table->timestamps();
         });
     }

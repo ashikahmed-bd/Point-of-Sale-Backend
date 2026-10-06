@@ -43,15 +43,23 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard', [AppController::class, 'dashboard']);
 
+
     Route::apiResource('categories', CategoryController::class);
+    Route::get('search/categories', [CategoryController::class, 'search']);
+
     Route::apiResource('brands', BrandController::class);
+    Route::get('search/brands', [BrandController::class, 'search']);
+
     Route::apiResource('units', UnitController::class);
+    Route::get('search/units', [UnitController::class, 'search']);
+
     Route::apiResource('taxes', TaxController::class);
+    Route::get('search/taxes', [TaxController::class, 'search']);
 
     Route::apiResource('products', ProductController::class);
     Route::post('products/{product}/media', [ProductController::class, 'media']);
 
-    Route::prefix('cart')->group(function () {
+    Route::prefix('cart')->middleware('store')->group(function () {
         Route::get('/', [CartController::class, 'index']);
         Route::post('/items', [CartController::class, 'store']);
         Route::put('/items/{item}', [CartController::class, 'update']);
@@ -59,9 +67,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::post('/items/{item}/decrement', [CartController::class, 'decrement']);
         Route::delete('/items/{item}', [CartController::class, 'destroy']);
         Route::delete('/', [CartController::class, 'clear']);
-        Route::post('/discount', [CartController::class, 'discount']);
-        Route::post('/tax', [CartController::class, 'tax']);
-        Route::post('/shipping', [CartController::class, 'shipping']);
+        Route::patch('/discount', [CartController::class, 'discount']);
+        Route::patch('/shipping', [CartController::class, 'shipping']);
+    });
+
+    Route::prefix('sales')->group(function () {
+        Route::get('/', [SaleController::class, 'index']);
+        Route::post('/', [SaleController::class, 'store']);
+
+        Route::get('/recent', [SaleController::class, 'recent']);
+        Route::get('/drafts', [SaleController::class, 'drafts']);
+
+        Route::get('/{sale}', [SaleController::class, 'show']);
+        Route::put('/{sale}', [SaleController::class, 'update']);
+        Route::delete('/{sale}', [SaleController::class, 'destroy']);
+
+        Route::post('/{sale}/hold', [SaleController::class, 'hold']);
+        Route::post('/{sale}/resume', [SaleController::class, 'resume']);
+        Route::post('/{sale}/complete', [SaleController::class, 'complete']);
+        Route::post('/{sale}/cancel', [SaleController::class, 'cancel']);
     });
 
 
@@ -75,7 +99,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('variants', VariantController::class);
     Route::apiResource('warehouses', WarehouseController::class);
 
-    Route::apiResource('sales', SaleController::class);
+
 
     Route::apiResource('suppliers', SupplierController::class);
     Route::apiResource('customers', CustomerController::class);

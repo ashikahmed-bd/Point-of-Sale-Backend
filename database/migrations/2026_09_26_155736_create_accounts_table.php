@@ -26,6 +26,9 @@ return new class extends Migration
             $table->decimal('opening_balance', 15, 2)->default(0);
             $table->decimal('current_balance', 15, 2)->default(0);
 
+            $table->char('currency', 3)->default(config('app.currency'));
+
+            $table->boolean('is_default')->default(false);
             $table->boolean('active')->default(true);
             $table->text('note')->nullable();
 

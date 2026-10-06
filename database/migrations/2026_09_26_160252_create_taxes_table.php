@@ -15,11 +15,14 @@ return new class extends Migration
             $table->ulid('id')->primary();
 
             $table->string('name');
+            $table->string('code')->nullable()->unique();
 
-            $table->decimal('rate', 10, 2)->default(0);
+            $table->decimal('rate', 8, 4)->default(0);
+            $table->enum('type', ['percentage', 'fixed'])->default('percentage');
 
-            $table->string('type')->default('percentage');
+            $table->enum('calculation', ['exclusive', 'inclusive'])->default('exclusive');
 
+            $table->boolean('is_default')->default(false);
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();

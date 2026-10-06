@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
 {
@@ -56,6 +57,24 @@ class Product extends Model
         return $this->hasMany(Variant::class, 'product_id');
     }
 
+    public function getCoverUrlAttribute(): string
+    {
+        if (empty($this->cover)) {
+            return asset('/assets/products/default.svg');
+        }
+
+        return Storage::disk($this->disk)->url($this->cover);
+    }
+
+
+    public function getGalleryUrlAttribute(): array
+    {
+        if (!is_array($this->gallery)) return [];
+
+        return collect($this->gallery)
+            ->map(fn($path) => Storage::disk($this->disk)->url($path))
+            ->toArray();
+    }
 
     protected static function booted(): void
     {

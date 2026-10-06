@@ -30,6 +30,8 @@ return new class extends Migration
             $table->decimal('balance_before', 15, 2);
             $table->decimal('balance_after', 15, 2);
 
+            $table->char('currency', 3)->default(config('app.currency'));
+
             $table->nullableUlidMorphs('reference');
 
             $table->text('description')->nullable();
