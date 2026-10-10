@@ -24,9 +24,11 @@ class CartResource extends JsonResource
                 $this->whenLoaded('store')
             ),
 
-            'customer' => CustomerResource::make(
-                $this->whenLoaded('customer')
-            ),
+            'customer' => $this->whenLoaded('customer', fn() => [
+                'id' => $this->customer->id,
+                'name' => $this->customer->name,
+                'phone' => $this->customer->phone,
+            ]),
 
             'subtotal' => $this->subtotal,
             'discount' => $this->discount,
@@ -34,6 +36,7 @@ class CartResource extends JsonResource
             'shipping' => $this->shipping,
             'total' => $this->total,
             'currency' => $this->currency,
+            'status' => $this->status,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

@@ -88,6 +88,9 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
+                'discount' => 0,
+                'shipping' => 0,
+
                 'total' => max(
                     $subtotal
                         - $cart->discount
@@ -104,10 +107,8 @@ class CartService
     /**
      * Update cart item.
      */
-    public function update(
-        CartItem $item,
-        int $quantity
-    ): Cart {
+    public function update(CartItem $item, int $quantity): Cart
+    {
         if ($quantity < 1) {
             throw new InvalidArgumentException(
                 'Quantity must be at least 1.'
@@ -144,6 +145,8 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
+                'discount' => 0,
+                'shipping' => 0,
 
                 'total' => max(
                     $subtotal
@@ -163,10 +166,8 @@ class CartService
     /**
      * Increase cart item.
      */
-    public function increment(
-        CartItem $item,
-        int $quantity = 1
-    ): Cart {
+    public function increment(CartItem $item, int $quantity = 1): Cart
+    {
         if ($quantity < 1) {
             throw new InvalidArgumentException(
                 'Quantity must be at least 1.'
@@ -187,8 +188,7 @@ class CartService
 
             $item->quantity += $quantity;
 
-            $item->total =
-                $item->price * $item->quantity;
+            $item->total =  $item->price * $item->quantity;
 
             $item->save();
 
@@ -196,6 +196,8 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
+                'discount' => 0,
+                'shipping' => 0,
 
                 'total' => max(
                     $subtotal
@@ -206,19 +208,15 @@ class CartService
                 ),
             ]);
 
-            return $cart
-                ->refresh()
-                ->load('items');
+            return $cart->refresh()->load('items');
         });
     }
 
     /**
      * Decrease cart item.
      */
-    public function decrement(
-        CartItem $item,
-        int $quantity = 1
-    ): Cart {
+    public function decrement(CartItem $item, int $quantity = 1): Cart
+    {
         if ($quantity < 1) {
             throw new InvalidArgumentException(
                 'Quantity must be at least 1.'
@@ -252,6 +250,8 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
+                'discount' => 0,
+                'shipping' => 0,
 
                 'total' => max(
                     $subtotal
@@ -262,9 +262,7 @@ class CartService
                 ),
             ]);
 
-            return $cart
-                ->refresh()
-                ->load('items');
+            return $cart->refresh()->load('items');
         });
     }
 
@@ -288,6 +286,8 @@ class CartService
 
             $cart->update([
                 'subtotal' => $subtotal,
+                'discount' => 0,
+                'shipping' => 0,
 
                 'total' => max(
                     $subtotal
@@ -298,9 +298,7 @@ class CartService
                 ),
             ]);
 
-            return $cart
-                ->refresh()
-                ->load('items');
+            return $cart->refresh()->load('items');
         });
     }
 
@@ -367,9 +365,7 @@ class CartService
                 'total' => 0,
             ]);
 
-            return $cart
-                ->refresh()
-                ->load('items');
+            return $cart->refresh()->load('items');
         });
     }
 }

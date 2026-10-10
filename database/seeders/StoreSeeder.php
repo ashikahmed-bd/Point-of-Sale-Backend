@@ -14,13 +14,7 @@ class StoreSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::where('email', 'admin@example.com')->first();
-
-        if (! $user) {
-            return;
-        }
-
-        $store = Store::create([
+        Store::create([
             'name' => 'Main Store',
             'code' => 'MAIN',
 
@@ -33,11 +27,6 @@ class StoreSeeder extends Seeder
             'postcode' => '1200',
             'country' => 'Bangladesh',
 
-            'is_active' => true,
-        ]);
-
-        $store->users()->attach($user->id, [
-            'role' => 'owner',
             'is_active' => true,
         ]);
     }

@@ -14,14 +14,18 @@ class Store extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class)
-            ->withPivot(['role', 'is_default', 'is_active'])
-            ->withTimestamps();
+        return $this->hasMany(User::class);
     }
 
 
     public function accounts()
     {
         return $this->hasMany(Account::class);
+    }
+
+    public function account()
+    {
+        return $this->hasOne(Account::class)
+            ->where('is_default', true);
     }
 }

@@ -67,7 +67,7 @@ class Sale extends Model
     {
         static::creating(function ($sale) {
             if (!$sale->invoice_no) {
-                $sale->invoice_no = 'INV-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4));
+                $sale->invoice_no = now()->format('Ymd-His');
             }
         });
     }

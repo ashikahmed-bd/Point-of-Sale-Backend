@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\SaleRequest;
+use App\Http\Resources\CartResource;
 use App\Http\Resources\SaleResource;
-use App\Models\Account;
+use App\Models\Cart;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
@@ -40,19 +39,19 @@ class SaleController extends Controller
             ->when($request->account_id, function ($query, $accountId) {
                 $query->where('account_id', $accountId);
             })
-            ->when($request->payment_status, function ($query, $status) {
-                $query->where('payment_status', $status);
+            ->when($request->payment, function ($query, $status) {
+                $query->where('payment', $status);
             })
             ->when($request->status, function ($query, $status) {
                 $query->where('status', $status);
             })
             ->when($request->from_date, function ($query, $date) {
-                $query->whereDate('sale_date', '>=', $date);
+                $query->whereDate('date', '>=', $date);
             })
             ->when($request->to_date, function ($query, $date) {
-                $query->whereDate('sale_date', '<=', $date);
+                $query->whereDate('date', '<=', $date);
             })
-            ->latest('sale_date')
+            ->latest('date')
             ->paginate($request->integer('limit', 20));
 
         return SaleResource::collection($sales);
@@ -77,30 +76,21 @@ class SaleController extends Controller
             ], 422);
         }
 
+        $user = $request->user();
 
-        $sale = DB::transaction(function () use ($request, $cart) {
+        $account = $user->store->account;
 
-            $store = $request->header('X-Store-ID');
+        if (!$account) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Default account is not configured for this store.',
+            ], 422);
+        }
 
-            if (!$store) {
-                throw ValidationException::withMessages([
-                    'store' => 'Store selection is required.',
-                ]);
-            }
-
-            $account = Account::query()
-                ->where('store_id', $store)
-                ->where('is_default', true)
-                ->first();
-
-            if (!$account) {
-                throw ValidationException::withMessages([
-                    'account_id' => 'Default account not found.',
-                ]);
-            }
+        $sale = DB::transaction(function () use ($request, $cart, $user, $account) {
 
             $sale = Sale::create([
-                'store_id' => $store,
+                'store_id' => $user->store_id,
                 'customer_id' => $request->input('customer_id'),
                 'account_id' => $account->id,
 
@@ -110,7 +100,6 @@ class SaleController extends Controller
                 'shipping' => $cart->shipping,
                 'total' => $cart->total,
 
-                'method' => $account->name,
                 'payable' => $request->input('payable'),
                 'change_amount' => max($request->input('payable') - $cart->total, 0),
                 'due_amount' => max($cart->total - $request->input('payable'), 0),
@@ -167,10 +156,23 @@ class SaleController extends Controller
             'description' => 'Sale created.',
         ]);
 
-        return SaleResource::make($sale->refresh())->additional([
-            'success' => true,
-            'message' => 'Sale created successfully.',
+        $sale->load([
+            'customer:id,name,phone',
+            'store',
+            'account',
+            'items',
         ]);
+
+        $cart = app(CartService::class)->clear();
+
+        return response()->json(
+            $sale->refresh()->load([
+                'store',
+                'customer',
+                'items.product',
+                'payments',
+            ]),
+        );
     }
 
     /**
@@ -179,7 +181,6 @@ class SaleController extends Controller
     public function show(Sale $sale)
     {
         $sale->load([
-            'store',
             'customer',
             'account',
             'items',
@@ -267,5 +268,49 @@ class SaleController extends Controller
             'success' => true,
             'message' => 'Sale deleted successfully.',
         ]);
+    }
+
+    public function recent()
+    {
+        $sales = Sale::with([
+            'customer:id,name,phone',
+            'account:id,name',
+            'items',
+        ])
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return SaleResource::collection($sales);
+    }
+
+    public function hold(Request $request)
+    {
+        $request->validate([
+            'customer_id' => ['nullable', 'ulid', 'exists:customers,id'],
+        ]);
+
+        $cart = app(CartService::class)->get();
+
+        $cart->update([
+            'customer_id' => $request->input('customer_id', ''),
+            'status' => 'draft',
+        ]);
+
+        return CartResource::make($cart->fresh()->load('items'))->additional([
+            'success' => true,
+            'message' => 'Order hold successfully.',
+        ]);
+    }
+
+    public function drafts()
+    {
+        $carts = Cart::query()
+            ->with(['customer', 'items'])
+            ->where('status', 'draft')
+            ->latest()
+            ->get();
+
+        return CartResource::collection($carts);
     }
 }

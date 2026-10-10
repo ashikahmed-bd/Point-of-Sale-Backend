@@ -24,7 +24,7 @@ return new class extends Migration
             $table->decimal('cost_price', 15, 2)->default(0);
             $table->decimal('price', 15, 2);
 
-            $table->decimal('quantity', 15, 3);
+            $table->unsignedInteger('quantity')->default(1);
 
             $table->decimal('discount', 15, 2)->default(0);
 

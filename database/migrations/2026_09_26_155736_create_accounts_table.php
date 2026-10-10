@@ -17,7 +17,6 @@ return new class extends Migration
             $table->foreignUlid('store_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
-            $table->string('type')->default('cash');
 
             $table->string('account_no')->nullable();
             $table->string('bank_name')->nullable();

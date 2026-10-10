@@ -63,11 +63,9 @@ class User extends Authenticatable
         return $this->phone;
     }
 
-    public function stores()
+    public function store()
     {
-        return $this->belongsToMany(Store::class)
-            ->withPivot(['role', 'is_default', 'is_active'])
-            ->withTimestamps();
+        return $this->belongsTo(Store::class);
     }
 
     public function products()

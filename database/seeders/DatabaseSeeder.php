@@ -23,6 +23,10 @@ class DatabaseSeeder extends Seeder
             UnitSeeder::class,
             TaxSeeder::class,
             ProductSeeder::class,
+
+            SupplierSeeder::class,
+            PurchaseSeeder::class,
+            CustomerSeeder::class,
         ]);
     }
 }

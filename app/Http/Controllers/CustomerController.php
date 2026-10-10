@@ -26,7 +26,7 @@ class CustomerController extends Controller
                 $query->where('is_active', $request->boolean('is_active'));
             })
             ->latest()
-            ->paginate($request->integer('limit', 20));
+            ->paginate($request->integer('limit', 10));
 
         return CustomerResource::collection($customers);
     }
@@ -102,5 +102,24 @@ class CustomerController extends Controller
             'success' => true,
             'message' => 'Customer deleted successfully.',
         ]);
+    }
+
+    public function search(Request $request)
+    {
+        $customers = Customer::query()
+            ->when($request->query('keyword'), function ($query, $keyword) {
+                $query->where(function ($q) use ($keyword) {
+                    $q->where('name', 'like', "%{$keyword}%")
+                        ->orWhere('phone', 'like', "%{$keyword}%")
+                        ->orWhere('email', 'like', "%{$keyword}%");
+                });
+            })
+            ->when($request->has('is_active'), function ($query) use ($request) {
+                $query->where('is_active', $request->boolean('is_active'));
+            })
+            ->latest()
+            ->get();
+
+        return CustomerResource::collection($customers);
     }
 }

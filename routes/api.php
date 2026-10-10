@@ -59,7 +59,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('products', ProductController::class);
     Route::post('products/{product}/media', [ProductController::class, 'media']);
 
-    Route::prefix('cart')->middleware('store')->group(function () {
+    Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index']);
         Route::post('/items', [CartController::class, 'store']);
         Route::put('/items/{item}', [CartController::class, 'update']);
@@ -71,21 +71,33 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::patch('/shipping', [CartController::class, 'shipping']);
     });
 
+    Route::prefix('purchases')->group(function () {
+        Route::get('/', [PurchaseController::class, 'index']);
+        Route::post('/', [PurchaseController::class, 'store']);
+        Route::get('/{purchase}', [PurchaseController::class, 'show']);
+        Route::put('/{purchase}', [PurchaseController::class, 'update']);
+        Route::delete('/{purchase}', [PurchaseController::class, 'destroy']);
+
+        Route::get('/recent', [PurchaseController::class, 'recent']);
+        Route::get('/drafts', [PurchaseController::class, 'drafts']);
+
+        Route::post('/{purchase}/receive', [PurchaseController::class, 'receive']);
+        Route::post('/{purchase}/cancel', [PurchaseController::class, 'cancel']);
+    });
+
     Route::prefix('sales')->group(function () {
         Route::get('/', [SaleController::class, 'index']);
         Route::post('/', [SaleController::class, 'store']);
-
-        Route::get('/recent', [SaleController::class, 'recent']);
-        Route::get('/drafts', [SaleController::class, 'drafts']);
-
         Route::get('/{sale}', [SaleController::class, 'show']);
         Route::put('/{sale}', [SaleController::class, 'update']);
         Route::delete('/{sale}', [SaleController::class, 'destroy']);
 
-        Route::post('/{sale}/hold', [SaleController::class, 'hold']);
-        Route::post('/{sale}/resume', [SaleController::class, 'resume']);
-        Route::post('/{sale}/complete', [SaleController::class, 'complete']);
-        Route::post('/{sale}/cancel', [SaleController::class, 'cancel']);
+        Route::get('/drafts', [SaleController::class, 'drafts']);
+        Route::get('/recent', [SaleController::class, 'recent']);
+        Route::post('/hold', [SaleController::class, 'hold']);
+        // Route::post('/{sale}/resume', [SaleController::class, 'resume']);
+        // Route::post('/{sale}/complete', [SaleController::class, 'complete']);
+        // Route::post('/{sale}/cancel', [SaleController::class, 'cancel']);
     });
 
 
@@ -94,15 +106,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('payments', PaymentController::class);
     Route::apiResource('expenses', ExpenseController::class);
 
-    Route::apiResource('purchases', PurchaseController::class);
-
     Route::apiResource('variants', VariantController::class);
     Route::apiResource('warehouses', WarehouseController::class);
 
 
-
     Route::apiResource('suppliers', SupplierController::class);
-    Route::apiResource('customers', CustomerController::class);
+
+    Route::prefix('customers')->group(function () {
+        Route::get('search', [CustomerController::class, 'search']);
+        Route::get('/', [CustomerController::class, 'index']);
+        Route::post('/', [CustomerController::class, 'store']);
+        Route::get('customers/{customer}', [CustomerController::class, 'show']);
+        Route::put('customers/{customer}', [CustomerController::class, 'update']);
+        Route::delete('customers/{customer}', [CustomerController::class, 'destroy']);
+    });
 
     Route::apiResource('expense-categories', ExpenseCategoryController::class);
     Route::apiResource('expenses', ExpenseController::class);

@@ -27,6 +27,16 @@ return new class extends Migration
             $table->string('photo')->default('');
             $table->string('disk')->default(config('filesystems.default'));
 
+            $table->enum('role', [
+                'owner',
+                'admin',
+                'manager',
+                'cashier',
+                'salesman',
+                'accountant',
+                'inventory',
+            ])->default('cashier');
+
             $table->timestamp('last_seen_at')->nullable();
 
             $table->rememberToken();

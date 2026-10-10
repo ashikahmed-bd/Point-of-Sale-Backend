@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignUlid('account_id')->constrained()->restrictOnDelete();
 
             $table->string('invoice_no')->unique();
+            $table->date('date')->useCurrent();
 
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
@@ -33,7 +34,6 @@ return new class extends Migration
             $table->char('currency', 3)->default(config('app.currency'));
 
             $table->string('payment')->default('paid');
-            $table->string('method')->default('cash');
             $table->string('status')->default('completed');
 
             $table->text('note')->nullable();
