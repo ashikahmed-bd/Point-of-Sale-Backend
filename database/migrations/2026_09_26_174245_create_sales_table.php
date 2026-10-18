@@ -33,8 +33,8 @@ return new class extends Migration
 
             $table->char('currency', 3)->default(config('app.currency'));
 
-            $table->string('payment')->default('paid');
-            $table->string('status')->default('completed');
+            $table->enum('payment', ['unpaid', 'paid', 'partial'])->default('unpaid');
+            $table->enum('status', ['pending', 'processing', 'completed', 'cancelled'])->default('completed');
 
             $table->text('note')->nullable();
 

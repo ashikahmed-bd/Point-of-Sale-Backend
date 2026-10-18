@@ -26,6 +26,8 @@ return new class extends Migration
                 ->constrained('attribute_options')
                 ->cascadeOnDelete();
 
+            $table->unsignedInteger('sort_order')->default(0);
+
             $table->timestamps();
 
             $table->unique([

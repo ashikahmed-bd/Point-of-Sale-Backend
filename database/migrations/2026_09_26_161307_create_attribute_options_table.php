@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('attribute_options', function (Blueprint $table) {
             $table->ulid('id')->primary();
- 
+
             $table->foreignUlid('attribute_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
@@ -22,8 +22,8 @@ return new class extends Migration
             $table->unsignedInteger('sort_order')->default(0);
 
             $table->timestamps();
-            
-            $table->unique(['attribute_id', 'slug']);
+
+            $table->unique(['attribute_id', 'name']);
         });
     }
 

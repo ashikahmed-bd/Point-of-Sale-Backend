@@ -26,15 +26,10 @@ return new class extends Migration
             $table->json('options')->nullable();
 
             $table->decimal('cost_price', 15, 2)->default(0);
-            $table->decimal('selling_price', 15, 2)->default(0);
-            $table->decimal('compare_price', 15, 2)->nullable();
+            $table->decimal('price', 15, 2)->default(0);
+            $table->decimal('base_price', 15, 2)->nullable();
 
             $table->unsignedInteger('stock')->default(0);
-            $table->unsignedInteger('min_stock')->default(0);
-            $table->unsignedInteger('max_stock')->nullable();
-
-            $table->boolean('track_stock')->default(true);
-            $table->boolean('allow_backorder')->default(false);
 
             $table->string('image')->nullable();
             $table->string('disk')->default(config('filesystems.default'));
@@ -43,7 +38,6 @@ return new class extends Migration
             $table->boolean('active')->default(true);
 
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

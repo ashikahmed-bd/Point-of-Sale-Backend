@@ -31,7 +31,9 @@ class CartController extends Controller
 
         $cart = $cart->add(
             $request->product_id,
-            $request->quantity
+            $request->variant_id,
+            $request->quantity,
+            $request->input('meta', [])
         );
 
         return CartResource::make($cart)->additional([
@@ -48,14 +50,16 @@ class CartController extends Controller
     public function update(Request $request, CartItem $item)
     {
         $request->validate([
-            'quantity' => ['required', 'integer', 'min:1',],
+            'quantity' => ['required', 'integer', 'min:1'],
+            'meta' => ['sometimes', 'array'],
         ]);
 
         $cart = app(CartService::class);
 
         $cart = $cart->update(
             $item,
-            $request->integer('quantity')
+            $request->integer('quantity'),
+            $request->input('meta', [])
         );
 
         return CartResource::make($cart)->additional([

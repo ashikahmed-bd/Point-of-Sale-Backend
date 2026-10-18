@@ -104,4 +104,24 @@ class SupplierController extends Controller
             'message' => 'Supplier deleted successfully.',
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $suppliers = Supplier::query()
+            ->when($request->input('keywords'), function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('company_name', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            })
+            ->when($request->has('is_active'), function ($query) use ($request) {
+                $query->where('is_active', $request->boolean('is_active'));
+            })
+            ->limit(20)
+            ->get();
+
+        return SupplierResource::collection($suppliers);
+    }
 }

@@ -4,6 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Storage;
 
 class Variant extends Model
 {
@@ -14,22 +17,30 @@ class Variant extends Model
     protected $casts = [
         'options' => 'array',
         'cost_price' => 'decimal:2',
-        'selling_price' => 'decimal:2',
-        'compare_price' => 'decimal:2',
-        'track_stock' => 'boolean',
-        'allow_backorder' => 'boolean',
+        'price' => 'decimal:2',
+        'base_price' => 'decimal:2',
+        'stock' => 'integer',
         'is_default' => 'boolean',
         'active' => 'boolean',
     ];
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
     }
 
-    public function options()
+    public function options(): HasMany
     {
         return $this->hasMany(VariantOption::class);
+    }
+
+    public function getImageUrlAttribute(): string
+    {
+        if (empty($this->image)) {
+            return asset('/assets/products/default.svg');
+        }
+
+        return Storage::disk($this->disk)->url($this->image);
     }
 
     protected static function booted(): void

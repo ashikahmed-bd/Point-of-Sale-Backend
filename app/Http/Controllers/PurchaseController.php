@@ -7,6 +7,7 @@ use App\Http\Resources\PurchaseResource;
 use App\Models\Purchase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class PurchaseController extends Controller
 {
@@ -16,7 +17,12 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         $purchases = Purchase::query()
-            ->with(['store', 'supplier', 'items', 'creator'])
+            ->with([
+                'store',
+                'supplier',
+                'items',
+                'creator:id,name,email,photo'
+            ])
             ->withCount('items')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->search;
@@ -51,61 +57,48 @@ class PurchaseController extends Controller
      */
     public function store(PurchaseRequest $request)
     {
-        $items = $request->items;
 
-        return DB::transaction(function () use ($request, $items) {
-            $subtotal = 0;
-            $itemTax = 0;
+        return DB::transaction(function () use ($request) {
 
-            foreach ($items as $item) {
-                $subtotal += $item['quantity'] * $item['unit_cost'];
-                $itemTax += $item['tax'] ?? 0;
-            }
-
-            $discount = $request->discount ?? 0;
-            $tax = $request->tax ?? $itemTax;
-            $shipping = $request->shipping ?? 0;
-
-            $total = $subtotal - $discount + $tax + $shipping;
-            $paidAmount = $request->paid_amount ?? 0;
-
-            if ($paidAmount > $total) {
-                abort(422, 'Paid amount cannot exceed purchase total.');
+            if ($request->input('paid_amount') > $request->input('total')) {
+                throw ValidationException::withMessages([
+                    'paid_amount' => 'Paid amount cannot exceed the purchase total.',
+                ]);
             }
 
             $purchase = Purchase::create([
-                'store_id' => $request->user()?->store_id,
-                'supplier_id' => $request->supplier_id,
-                'purchase_date' => $request->date,
-                'subtotal' => $subtotal,
-                'discount' => $discount,
-                'tax' => $tax,
-                'shipping' => $shipping,
-                'total' => $total,
-                'paid_amount' => $paidAmount,
-                'due_amount' => $total - $paidAmount,
-                'currency' => config('app.currency'),
-                'status' => $request->status ?? 'draft',
-                'note' => $request->note,
+                'store_id' => $request->input('store_id'),
+                'supplier_id' => $request->input('supplier_id'),
+                'reference' => $request->input('reference'),
+                'purchase_date' => $request->input('purchase_date'),
+                'expected_date' => $request->input('expected_date'),
+
+                'subtotal' => $request->input('subtotal', 0),
+                'discount' => $request->input('discount', 0),
+                'tax' => $request->input('tax', 0),
+                'shipping' => $request->input('shipping', 0),
+                'total' => $request->input('total', 0),
+                'paid_amount' => $request->input('paid_amount', 0),
+                'due_amount' => $request->input('total', 0) - $request->input('paid_amount', 0),
+                'currency' => $request->input('currency', 'BDT'),
+
+                'status' => $request->input('status', 'draft'),
+
+                'note' => $request->input('note'),
                 'created_by' => $request->user()?->id,
             ]);
 
-            foreach ($items as $item) {
-                $quantity = $item['quantity'];
-                $unitCost = $item['unit_cost'];
-                $itemDiscount = $item['discount'] ?? 0;
-                $itemTaxAmount = $item['tax'] ?? 0;
 
+            foreach ($request->input('items', []) as $item) {
                 $purchase->items()->create([
-                    'product_id' => $item['product_id'],
+                    'product_id' => $item['id'],
                     'variant_id' => $item['variant_id'] ?? null,
-                    'name' => $item['name'],
-                    'sku' => $item['sku'],
-                    'quantity' => $quantity,
-                    'unit_cost' => $unitCost,
-                    'discount' => $itemDiscount,
-                    'tax' => $itemTaxAmount,
-                    'total' => ($quantity * $unitCost) - $itemDiscount + $itemTaxAmount,
+                    'quantity' => $item['quantity'],
+                    'unit_cost' => $item['unit_cost'],
+                    'discount' => $item['discount'] ?? 0,
+                    'tax' => $item['tax'] ?? 0,
+                    'subtotal' => $item['subtotal'] ?? 0,
+                    'total' => $item['total'] ?? 0,
                 ]);
             }
 

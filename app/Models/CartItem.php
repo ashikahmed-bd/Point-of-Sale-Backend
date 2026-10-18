@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CartItem extends Model
 {
@@ -14,8 +15,12 @@ class CartItem extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'quantity' => 'integer',
+        'discount' => 'decimal:2',
         'tax_rate' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'subtotal' => 'decimal:2',
         'total' => 'decimal:2',
+        'meta' => 'array',
     ];
 
     public function cart()
@@ -28,9 +33,9 @@ class CartItem extends Model
         return $this->belongsTo(Product::class);
     }
 
-    public function variant()
+    public function variant(): BelongsTo
     {
-        return $this->belongsTo(Variant::class);
+        return $this->belongsTo(Variant::class, 'variant_id');
     }
 
 

@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Serial;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
@@ -17,10 +20,34 @@ class Product extends Model
         'cost_price' => 'decimal:2',
         'selling_price' => 'decimal:2',
         'compare_price' => 'decimal:2',
+        'track_serial' => 'boolean',
+        'sold_count' => 'integer',
         'track_stock' => 'boolean',
         'allow_backorder' => 'boolean',
         'has_variants' => 'boolean',
     ];
+
+    public function scopeSummary(Builder $query): Builder
+    {
+        return $query->select([
+            'id',
+            'code',
+            'name',
+            'slug',
+            'sku',
+            'barcode',
+            'cost_price',
+            'price',
+            'base_price',
+            'currency',
+            'min_stock',
+            'stock',
+            'track_serial',
+            'sold_count',
+            'has_variants',
+            'cover',
+        ]);
+    }
 
     public function category()
     {
@@ -47,14 +74,26 @@ class Product extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function options()
+    public function options(): HasMany
     {
         return $this->hasMany(ProductOption::class);
     }
 
-    public function variants()
+    public function variants(): HasMany
     {
-        return $this->hasMany(Variant::class, 'product_id');
+        return $this->hasMany(Variant::class);
+    }
+
+    public function serials()
+    {
+        return $this->hasMany(Serial::class);
+    }
+
+    public function availableSerials()
+    {
+        return $this->hasMany(Serial::class)
+            ->where('status', 'in_stock')
+            ->orderBy('serial_number');
     }
 
     public function getCoverUrlAttribute(): string

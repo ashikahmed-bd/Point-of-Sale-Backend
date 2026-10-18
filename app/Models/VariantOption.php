@@ -5,6 +5,7 @@ namespace App\Models;
 use Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VariantOption extends Model
 {
@@ -12,18 +13,8 @@ class VariantOption extends Model
 
     protected $guarded = [];
 
-    public function variant()
+    public function variant(): BelongsTo
     {
         return $this->belongsTo(Variant::class);
-    }
-
-    public function attribute()
-    {
-        return $this->belongsTo(Attribute::class);
-    }
-
-    public function option()
-    {
-        return $this->belongsTo(AttributeOption::class, 'attribute_option_id');
     }
 }

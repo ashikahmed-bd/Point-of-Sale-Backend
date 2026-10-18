@@ -37,4 +37,12 @@ class SaleItem extends Model
     {
         return $this->belongsTo(Variant::class, 'variant_id');
     }
+
+    public function serials()
+    {
+        return $this->hasMany(
+            Serial::class,
+            'sale_item_id' // SaleItem model
+        );
+    }
 }

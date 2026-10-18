@@ -24,11 +24,6 @@ return new class extends Migration
                 'variant_id',
                 'attribute_id',
             ]);
-
-            $table->unique([
-                'attribute_id',
-                'attribute_option_id',
-            ]);
         });
     }
 

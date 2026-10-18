@@ -18,12 +18,26 @@ class CartItemResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'cart' => CartResource::make($this->whenLoaded('cart')),
-            'product' => ProductResource::make($this->whenLoaded('product')),
-            'variant' => VariantResource::make($this->whenLoaded('variant')),
+
+            'product' => $this->whenLoaded('product', fn() => [
+                'id' => $this->product->id,
+                'name' => $this->product->name,
+                'slug' => $this->product->slug,
+                'sku' => $this->product->sku,
+                'barcode' => $this->product->barcode,
+                'cover_url' => $this->product->cover_url,
+            ]),
+            'variant' => $this->whenLoaded('variant', fn() => [
+                'id' => $this->variant->id,
+                'name' => $this->variant->name,
+                'sku' => $this->variant->sku,
+                'barcode' => $this->variant->barcode,
+                'image_url' => $this->variant->image_url,
+            ]),
 
             'name' => $this->name,
             'sku' => $this->sku,
+            'meta' => $this->meta,
 
             'price' => $this->price,
             'quantity' => $this->quantity,

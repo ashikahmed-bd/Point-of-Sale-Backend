@@ -27,7 +27,7 @@ class BrandController extends Controller
                 $query->where('is_active', $request->boolean('is_active'));
             })
             ->latest()
-            ->paginate($request->integer('limit', 20));
+            ->paginate($request->integer('limit', 10));
 
         return BrandResource::collection($brands);
     }

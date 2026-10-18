@@ -35,7 +35,7 @@ class CategoryController extends Controller
             })
             ->orderBy('sort_order')
             ->latest()
-            ->paginate($request->integer('limit', 20));
+            ->paginate($request->integer('limit', 10));
 
         return CategoryResource::collection($categories);
     }

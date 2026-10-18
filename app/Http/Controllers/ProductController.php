@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
+use App\Http\Resources\ProductSummaryResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -22,11 +23,12 @@ class ProductController extends Controller
                 'tax:id,name',
                 'unit:id,name',
             ])
-            ->when($request->search, function ($query, $search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('name', 'like', "%{$search}%")
-                        ->orWhere('sku', 'like', "%{$search}%")
-                        ->orWhere('barcode', 'like', "%{$search}%");
+            ->when($request->filled('keywords'), function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', "%{$request->keywords}%")
+                        ->orWhere('code', 'like', "%{$request->keywords}%")
+                        ->orWhere('sku', 'like', "%{$request->keywords}%")
+                        ->orWhere('barcode', 'like', "%{$request->keywords}%");
                 });
             })
             ->when($request->category_id, function ($query, $categoryId) {
@@ -39,9 +41,43 @@ class ProductController extends Controller
                 $query->where('status', $status);
             })
             ->latest()
-            ->paginate($request->integer('limit', 20));
+            ->paginate($request->integer('limit', 10));
 
-        return ProductResource::collection($products);
+        $getStats = function ($query) {
+            $count = (clone $query)->count();
+
+            $lastMonth = (clone $query)
+                ->whereBetween('created_at', [
+                    now()->subMonth()->startOfMonth(),
+                    now()->subMonth()->endOfMonth(),
+                ])
+                ->count();
+
+            return [
+                'count' => $count,
+                'percentage' => $lastMonth > 0
+                    ? round((($count - $lastMonth) / $lastMonth) * 100, 2)
+                    : ($count > 0 ? 100 : 0),
+            ];
+        };
+
+        return ProductResource::collection($products)->additional([
+            'stats' => [
+                'total' => $getStats(Product::query()),
+
+                'low_stock' => $getStats(
+                    Product::where('stock', '>', 0)->where('stock', '<=', 5)
+                ),
+
+                'out_of_stock' => $getStats(
+                    Product::where('stock', '<=', 0)
+                ),
+
+                'active' => $getStats(
+                    Product::where('status', 'active')
+                ),
+            ],
+        ]);
     }
 
     /**
@@ -110,13 +146,13 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         $product->load([
-            'category:id,name',
-            'brand:id,name',
-            'tax:id,name',
-            'unit:id,name',
+            'variants',
+            'options.attribute',
+            'options.option',
+            'availableSerials',
         ]);
 
-        ProductResource::make($product);
+        return ProductSummaryResource::make($product);
     }
 
     /**
@@ -171,5 +207,37 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Product deleted successfully.',
         ]);
+    }
+
+
+    public function search(Request $request)
+    {
+        $products = Product::query()
+            ->summary()
+            ->with([
+                'variants',
+                'options.attribute',
+                'options.option',
+            ])
+            ->withCount(['variants'])
+            ->when($request->filled('keywords'), function ($query) use ($request) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('name', 'like', "%{$request->keywords}%")
+                        ->orWhere('code', 'like', "%{$request->keywords}%")
+                        ->orWhere('sku', 'like', "%{$request->keywords}%")
+                        ->orWhere('barcode', 'like', "%{$request->keywords}%");
+                });
+            })
+            ->when($request->category_id, function ($query, $categoryId) {
+                $query->where('category_id', $categoryId);
+            })
+            ->when($request->brand_id, function ($query, $brandId) {
+                $query->where('brand_id', $brandId);
+            })
+            ->orderByDesc('sold_count')
+            ->limit(20)
+            ->get();
+
+        return ProductSummaryResource::collection($products);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Prefix;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,14 +14,26 @@ class Purchase extends Model
 
     protected $guarded = [];
 
-    public function store()
-    {
-        return $this->belongsTo(Store::class);
-    }
+    protected $casts = [
+        'purchase_date' => 'date',
+        'expected_date' => 'date',
+        'subtotal' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'tax' => 'decimal:2',
+        'shipping' => 'decimal:2',
+        'total' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'due_amount' => 'decimal:2',
+    ];
 
-    public function supplier()
+    public function supplier(): BelongsTo
     {
         return $this->belongsTo(Supplier::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function items(): HasMany
@@ -42,7 +55,7 @@ class Purchase extends Model
     {
         static::creating(function ($model) {
             if (empty($model->purchase_no)) {
-                $model->purchase_no = now()->format('Ymd-His');
+                $model->purchase_no = Prefix::PURCHASE->value . '-' . now()->format('Ymd-His');
             }
         });
     }

@@ -18,8 +18,9 @@ return new class extends Migration
             $table->foreignUlid('supplier_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('purchase_no')->nullable();
-
-            $table->date('date')->useCurrent();
+            $table->date('purchase_date')->useCurrent();
+            $table->date('expected_date')->nullable();
+            $table->string('reference')->nullable();
 
             $table->decimal('subtotal', 15, 2)->default(0);
             $table->decimal('discount', 15, 2)->default(0);
@@ -32,12 +33,7 @@ return new class extends Migration
 
             $table->char('currency', 3)->default(config('app.currency'));
 
-            $table->enum('status', [
-                'draft',
-                'ordered',
-                'received',
-                'cancelled',
-            ])->default('received');
+            $table->enum('status', ['draft', 'ordered', 'received', 'cancelled'])->default('draft');
 
             $table->text('note')->nullable();
 
@@ -46,6 +42,11 @@ return new class extends Migration
                 ->nullOnDelete();
 
             $table->timestamps();
+
+            $table->unique(
+                ['store_id', 'purchase_no'],
+                'purchases_store_purchase_no_unique'
+            );
         });
     }
 

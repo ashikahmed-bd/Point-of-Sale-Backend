@@ -8,7 +8,6 @@ use App\Models\Store;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class PurchaseSeeder extends Seeder
 {
@@ -17,89 +16,65 @@ class PurchaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $store = Store::query()->first();
-        $supplier = Supplier::query()->first();
-        $user = User::query()->first();
-        $products = Product::query()->take(3)->get();
+        $purchase = Purchase::query()->create([
+            'store_id' => Store::query()->first()?->id,
+            'supplier_id' => Supplier::query()->first()?->id,
+            'purchase_no' => now()->format('Ymd-His'),
+            'purchase_date' => now(),
+            'expected_date' => now()->subDays(5),
+            'reference' => 'INV-SUP-001',
 
-        if (! $store || $products->isEmpty()) {
-            return;
-        }
+            'subtotal' => 5000,
+            'discount' => 200,
+            'tax' => 250,
+            'shipping' => 100,
+            'total' => 5150,
+            'paid_amount' => 3000,
+            'due_amount' => 2150,
+            'currency' => config('app.currency', 'BDT'),
 
-        $purchases = [
-            [
-                'supplier_id' => $supplier?->id,
-                'date' => now()->subDays(5),
-                'subtotal' => 5000,
-                'discount' => 200,
-                'tax' => 250,
-                'shipping' => 100,
-                'total' => 5150,
-                'paid_amount' => 3000,
-                'due_amount' => 2150,
-                'currency' => config('app.currency', 'BDT'),
-                'status' => 'received',
-                'note' => 'Initial stock purchase',
-            ],
-            [
-                'supplier_id' => $supplier?->id,
-                'date' => now()->subDays(2),
-                'subtotal' => 3000,
-                'discount' => 100,
-                'tax' => 150,
-                'shipping' => 50,
-                'total' => 3100,
-                'paid_amount' => 3100,
-                'due_amount' => 0,
-                'currency' => config('app.currency', 'BDT'),
-                'status' => 'ordered',
-                'note' => 'Regular stock purchase',
-            ],
-            [
-                'supplier_id' => $supplier?->id,
-                'date' => now(),
-                'subtotal' => 2000,
-                'discount' => 0,
-                'tax' => 100,
-                'shipping' => 0,
-                'total' => 2100,
-                'paid_amount' => 0,
-                'due_amount' => 2100,
-                'currency' => config('app.currency', 'BDT'),
-                'status' => 'draft',
-                'note' => 'Draft purchase',
-            ],
-        ];
+            'status' => 'received',
+            'note' => 'Initial stock purchase',
+            'created_by' => User::query()->first()?->id,
+        ]);
 
-        foreach ($purchases as $purchase) {
-            DB::transaction(function () use ($purchase,  $store,  $user, $products) {
-                $purchase = Purchase::query()->create(
-                    array_merge($purchase, [
-                        'store_id' => $store->id,
-                        'purchase_no' => now()->format('Ymd-His'),
-                        'created_by' => $user?->id,
-                    ])
-                );
+        $products = Product::query()->limit(5)->get();
 
-                foreach ($products as $product) {
-                    $quantity = 10;
-                    $unitCost = 500;
-                    $discount = 0;
-                    $tax = 0;
+        foreach ($products as $product) {
+            $quantity = fake()->numberBetween(1, 20);
+            $unitCost = fake()->randomFloat(2, 100, 5000);
+            $discount = fake()->randomFloat(2, 0, 200);
+            $tax = fake()->randomFloat(2, 0, 100);
 
-                    $purchase->items()->create([
-                        'product_id' => $product->id,
-                        'variant_id' => null,
-                        'name' => $product->name,
-                        'sku' => $product->sku,
-                        'quantity' => $quantity,
-                        'unit_cost' => $unitCost,
-                        'discount' => $discount,
-                        'tax' => $tax,
-                        'total' => ($quantity * $unitCost) - $discount + $tax,
-                    ]);
-                }
-            });
+            $subtotal = $quantity * $unitCost;
+            $total = $subtotal - $discount + $tax;
+
+            $item = $purchase->items()->create([
+                'product_id' => $product->id,
+                'variant_id' => null,
+                'quantity' => $quantity,
+                'unit_cost' => $unitCost,
+                'discount' => $discount,
+                'tax' => $tax,
+                'subtotal' => $subtotal,
+                'total' => $total,
+            ]);
+
+
+            for ($i = 0; $i < $quantity; $i++) {
+                $product->serials()->create([
+                    'store_id' => $purchase->store_id,
+                    'variant_id' => $item->variant_id,
+                    'purchase_item_id' => $item->id,
+
+                    'serial_number' => fake()->unique()->bothify('SN-##########'),
+                    'imei' => fake()->unique()->numerify('###############'),
+
+                    'status' => 'in_stock',
+                    'condition' => 'new',
+                    'purchase_date' => now()->toDateString(),
+                ]);
+            }
         }
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductOption extends Model
 {
@@ -17,13 +17,12 @@ class ProductOption extends Model
         return $this->belongsTo(Product::class);
     }
 
-
-    public function attribute()
+    public function attribute(): BelongsTo
     {
-        return $this->belongsTo(Attribute::class);
+        return $this->belongsTo(Attribute::class, 'attribute_id');
     }
 
-    public function option()
+    public function option(): BelongsTo
     {
         return $this->belongsTo(AttributeOption::class, 'attribute_option_id');
     }

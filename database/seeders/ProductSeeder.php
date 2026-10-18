@@ -120,13 +120,16 @@ class ProductSeeder extends Seeder
             ],
         ];
 
+
+
         foreach ($products as $product) {
-            Product::query()->create(array_merge($product, [
+            $product = Product::query()->create(array_merge($product, [
                 'code' => fake()->unique()->numerify('100#####'),
-                'category_id' => fake()->randomElement(Category::query()->pluck('id')->toArray()),
-                'brand_id' => fake()->randomElement(Brand::query()->pluck('id')->toArray()),
-                'tax_id' => fake()->randomElement(Tax::query()->pluck('id')->toArray()),
-                'unit_id' => fake()->randomElement(Unit::query()->pluck('id')->toArray()),
+
+                'category_id' => Category::inRandomOrder()->value('id'),
+                'brand_id' => Brand::inRandomOrder()->value('id'),
+                'tax_id' => Tax::inRandomOrder()->value('id'),
+                'unit_id' => Unit::inRandomOrder()->value('id'),
 
                 'barcode' => fake()->unique()->numerify('890100#####'),
                 'description' => fake()->sentence(12),
@@ -135,17 +138,17 @@ class ProductSeeder extends Seeder
                 'price' => fake()->randomFloat(2, 500, 3000),
                 'base_price' => fake()->randomFloat(2, 1000, 3500),
 
+                'stock' => fake()->numberBetween(100, 200),
                 'min_stock' => fake()->numberBetween(2, 10),
                 'max_stock' => fake()->numberBetween(20, 100),
 
                 'track_stock' => true,
+                'track_serial' => true,
+
                 'allow_backorder' => false,
-                'has_variants' => fake()->boolean(70),
+                'has_variants' => false,
 
                 'status' => 'active',
-
-                'created_at' => now(),
-                'updated_at' => now(),
             ]));
         }
     }

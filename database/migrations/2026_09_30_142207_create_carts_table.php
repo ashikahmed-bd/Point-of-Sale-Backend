@@ -14,9 +14,13 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
+            $table->foreignUlid('store_id')
+                ->constrained('stores')
+                ->restrictOnDelete();
+
             $table->foreignUlid('customer_id')
                 ->nullable()
-                ->constrained()
+                ->constrained('customers')
                 ->nullOnDelete();
 
             $table->uuid('token')->unique();
@@ -27,9 +31,13 @@ return new class extends Migration
             $table->decimal('shipping', 15, 2)->default(0);
             $table->decimal('total', 15, 2)->default(0);
 
-            $table->char('currency', 3)->default(config('app.currency'));
+            $table->char('currency', 3)
+                ->default(config('app.currency', 'BDT'));
 
-            $table->enum('status', ['active', 'draft'])->default('active');
+            $table->enum('status', [
+                'active',
+                'draft',
+            ])->default('active');
 
             $table->timestamps();
         });

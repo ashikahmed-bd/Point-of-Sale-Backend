@@ -34,6 +34,7 @@ class ProductResource extends JsonResource
             'currency' => $this->currency,
 
             'stock' => $this->stock,
+            'sold_count' => $this->sold_count,
             'min_stock' => $this->min_stock,
             'max_stock' => $this->max_stock,
 
@@ -92,6 +93,7 @@ class ProductResource extends JsonResource
                 ->values()
                 ->all(),
 
+            'variants_count' => $this->whenCounted('variants'),
             'variants' => VariantResource::collection(
                 $this->whenLoaded('variants')
             ),

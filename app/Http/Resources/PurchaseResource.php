@@ -20,7 +20,9 @@ class PurchaseResource extends JsonResource
             'id' => $this->id,
 
             'purchase_no' => $this->purchase_no,
-            'date' => $this->date,
+            'purchase_date' => $this->purchase_date,
+            'expected_date' => $this->expected_date,
+            'reference' => $this->reference,
 
             'subtotal' => (float) $this->subtotal,
             'discount' => (float) $this->discount,
@@ -30,12 +32,11 @@ class PurchaseResource extends JsonResource
 
             'paid_amount' => (float) $this->paid_amount,
             'due_amount' => (float) $this->due_amount,
-
             'currency' => $this->currency,
+
             'status' => $this->status,
             'note' => $this->note,
 
-            'created_by' => $this->created_by,
 
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
@@ -52,9 +53,12 @@ class PurchaseResource extends JsonResource
                 $this->whenLoaded('items')
             ),
 
-            'creator' => UserResource::make(
-                $this->whenLoaded('creator')
-            ),
+            'creator' => $this->whenLoaded('creator', fn() => [
+                'id' => $this->creator->id,
+                'name' => $this->creator->name,
+                'email' => $this->creator->email,
+                'photo_url' => $this->creator->photo_url,
+            ]),
         ];
     }
 }

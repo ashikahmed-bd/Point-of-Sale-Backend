@@ -29,13 +29,16 @@ return new class extends Migration
             $table->char('currency', 3)->default(config('app.currency'));
 
             $table->unsignedInteger('stock')->default(0);
+            $table->unsignedInteger('sold_count')->default(0);
             $table->unsignedInteger('min_stock')->default(0);
             $table->unsignedInteger('max_stock')->nullable();
+
             $table->boolean('track_stock')->default(true);
+            $table->boolean('track_serial')->default(false);
 
             $table->boolean('allow_backorder')->default(false);
-
             $table->boolean('has_variants')->default(false);
+
             $table->string('status')->default('active');
 
             $table->string('cover')->nullable();

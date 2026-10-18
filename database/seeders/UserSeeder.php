@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::create([
+            'store_id' => Store::query()->first()?->id,
             'name' => 'Admin',
             'email' => 'admin@example.com',
             'email_verified_at' => now(),
@@ -25,6 +26,7 @@ class UserSeeder extends Seeder
             'gender' => 'male',
 
             'disabled' => false,
+
 
             'photo' => '',
             'disk' => config('filesystems.default'),

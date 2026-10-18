@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\CartResource;
+use App\Http\Resources\PosSaleResource;
 use App\Http\Resources\SaleResource;
 use App\Models\Cart;
 use App\Models\Product;
@@ -10,6 +11,7 @@ use App\Models\Sale;
 use App\Services\CartService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 
 class SaleController extends Controller
 {
@@ -104,6 +106,11 @@ class SaleController extends Controller
                 'change_amount' => max($request->input('payable') - $cart->total, 0),
                 'due_amount' => max($cart->total - $request->input('payable'), 0),
 
+                'payment' => match (true) {
+                    $request->input('payable') <= 0 => 'unpaid',
+                    $request->input('payable') >= $cart->total => 'paid',
+                    default => 'partial',
+                },
                 'status' => 'completed',
                 'created_by' => $request->user()?->id,
             ]);
@@ -114,15 +121,17 @@ class SaleController extends Controller
                     ->lockForUpdate()
                     ->firstOrFail();
 
-                // if ($product->track_stock) {
-                //     if (!$product->allow_backorder && $product->stock < $item->quantity) {
-                //         throw ValidationException::withMessages([
-                //             'quantity' => "{$product->name} has insufficient stock.",
-                //         ]);
-                //     }
+                if ($product->track_stock) {
+                    if (!$product->allow_backorder && $product->stock < $item->quantity) {
+                        throw ValidationException::withMessages([
+                            'quantity' => "{$product->name} has insufficient stock.",
+                        ]);
+                    }
 
-                //     $product->decrement('stock', $item->quantity);
-                // }
+                    $product->decrement('stock', $item->quantity);
+                }
+
+                $product->increment('sold_count', $item->quantity);
 
                 $sale->items()->create([
                     'product_id' => $product->id,
@@ -165,14 +174,12 @@ class SaleController extends Controller
 
         $cart = app(CartService::class)->clear();
 
-        return response()->json(
-            $sale->refresh()->load([
-                'store',
-                'customer',
-                'items.product',
-                'payments',
-            ]),
-        );
+        return PosSaleResource::make($sale->refresh()->load([
+            'store',
+            'customer',
+            'items.product',
+            'payments',
+        ]));
     }
 
     /**

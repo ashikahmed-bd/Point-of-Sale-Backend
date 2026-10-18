@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\StoreResource;
 use App\Models\Store;
 use Illuminate\Http\Request;
 
@@ -45,6 +46,19 @@ class StoreController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        $stores = Store::query()
+            ->when($request->input('keywords'), function ($query, $keywords) {
+                $query->where('name', 'like', "%{$keywords}%");
+            })
+            ->select('*')
+            ->limit(20)
+            ->get();
+
+        return StoreResource::collection($stores);
     }
 
     public function switch(Request $request, Store $store)

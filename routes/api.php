@@ -13,8 +13,10 @@ use App\Http\Controllers\LogController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseReturnController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SaleReturnController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
@@ -43,21 +45,54 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('dashboard', [AppController::class, 'dashboard']);
 
+    Route::prefix('categories')->group(function () {
+        Route::get('/search', [CategoryController::class, 'search']);
+        Route::get('/', [CategoryController::class, 'index']);
+        Route::post('/', [CategoryController::class, 'store']);
+        Route::get('/{category}', [CategoryController::class, 'show']);
+        Route::put('/{category}', [CategoryController::class, 'update']);
+        Route::delete('/{category}', [CategoryController::class, 'destroy']);
+    });
 
-    Route::apiResource('categories', CategoryController::class);
-    Route::get('search/categories', [CategoryController::class, 'search']);
+    Route::prefix('brands')->group(function () {
+        Route::get('/search', [BrandController::class, 'search']);
+        Route::get('/', [BrandController::class, 'index']);
+        Route::post('/', [BrandController::class, 'store']);
+        Route::get('/{brand}', [BrandController::class, 'show']);
+        Route::put('/{brand}', [BrandController::class, 'update']);
+        Route::delete('/{brand}', [BrandController::class, 'destroy']);
+    });
 
-    Route::apiResource('brands', BrandController::class);
-    Route::get('search/brands', [BrandController::class, 'search']);
+    Route::prefix('units')->group(function () {
+        Route::get('/search', [UnitController::class, 'search']);
+        Route::get('/', [UnitController::class, 'index']);
+        Route::post('/', [UnitController::class, 'store']);
+        Route::get('/{unit}', [UnitController::class, 'show']);
+        Route::put('/{unit}', [UnitController::class, 'update']);
+        Route::delete('/{unit}', [UnitController::class, 'destroy']);
+    });
 
-    Route::apiResource('units', UnitController::class);
-    Route::get('search/units', [UnitController::class, 'search']);
 
-    Route::apiResource('taxes', TaxController::class);
-    Route::get('search/taxes', [TaxController::class, 'search']);
+    Route::prefix('taxes')->group(function () {
+        Route::get('/search', [TaxController::class, 'search']);
+        Route::get('/', [TaxController::class, 'index']);
+        Route::post('/', [TaxController::class, 'store']);
+        Route::get('/{tax}', [TaxController::class, 'show']);
+        Route::put('/{tax}', [TaxController::class, 'update']);
+        Route::delete('/{tax}', [TaxController::class, 'destroy']);
+    });
 
-    Route::apiResource('products', ProductController::class);
-    Route::post('products/{product}/media', [ProductController::class, 'media']);
+
+    Route::prefix('products')->group(function () {
+        Route::get('/search', [ProductController::class, 'search']);
+        Route::get('/', [ProductController::class, 'index']);
+        Route::post('/', [ProductController::class, 'store']);
+        Route::get('/{product}', [ProductController::class, 'show']);
+        Route::put('/{product}', [ProductController::class, 'update']);
+        Route::delete('/{product}', [ProductController::class, 'destroy']);
+        Route::post('{product}/media', [ProductController::class, 'media']);
+    });
+
 
     Route::prefix('cart')->group(function () {
         Route::get('/', [CartController::class, 'index']);
@@ -72,6 +107,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::prefix('purchases')->group(function () {
+        Route::prefix('returns')->group(function () {
+            Route::get('/', [PurchaseReturnController::class, 'index']);
+            Route::post('/', [PurchaseReturnController::class, 'store']);
+            Route::get('/{purchaseReturn}', [PurchaseReturnController::class, 'show']);
+            Route::put('/{purchaseReturn}', [PurchaseReturnController::class, 'update']);
+            Route::delete('/{purchaseReturn}', [PurchaseReturnController::class, 'destroy']);
+        });
+
         Route::get('/', [PurchaseController::class, 'index']);
         Route::post('/', [PurchaseController::class, 'store']);
         Route::get('/{purchase}', [PurchaseController::class, 'show']);
@@ -86,18 +129,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
     Route::prefix('sales')->group(function () {
+        Route::prefix('returns')->group(function () {
+            Route::get('/', [SaleReturnController::class, 'index']);
+            Route::post('/', [SaleReturnController::class, 'store']);
+            Route::get('/{saleReturn}', [SaleReturnController::class, 'show']);
+            Route::put('/{saleReturn}', [SaleReturnController::class, 'update']);
+            Route::delete('/{saleReturn}', [SaleReturnController::class, 'destroy']);
+        });
+
+
+        Route::get('/drafts', [SaleController::class, 'drafts']);
+        Route::get('/recent', [SaleController::class, 'recent']);
+        Route::post('/hold', [SaleController::class, 'hold']);
+
         Route::get('/', [SaleController::class, 'index']);
         Route::post('/', [SaleController::class, 'store']);
         Route::get('/{sale}', [SaleController::class, 'show']);
         Route::put('/{sale}', [SaleController::class, 'update']);
         Route::delete('/{sale}', [SaleController::class, 'destroy']);
-
-        Route::get('/drafts', [SaleController::class, 'drafts']);
-        Route::get('/recent', [SaleController::class, 'recent']);
-        Route::post('/hold', [SaleController::class, 'hold']);
-        // Route::post('/{sale}/resume', [SaleController::class, 'resume']);
-        // Route::post('/{sale}/complete', [SaleController::class, 'complete']);
-        // Route::post('/{sale}/cancel', [SaleController::class, 'cancel']);
     });
 
 
@@ -109,8 +158,25 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('variants', VariantController::class);
     Route::apiResource('warehouses', WarehouseController::class);
 
+    Route::prefix('suppliers')->group(function () {
+        Route::get('/search', [SupplierController::class, 'search']);
+        Route::get('/', [SupplierController::class, 'index']);
+        Route::post('/', [SupplierController::class, 'store']);
+        Route::get('/{supplier}', [SupplierController::class, 'show']);
+        Route::put('/{supplier}', [SupplierController::class, 'update']);
+        Route::delete('/{supplier}', [SupplierController::class, 'destroy']);
+    });
 
-    Route::apiResource('suppliers', SupplierController::class);
+
+    Route::prefix('stores')->group(function () {
+        Route::get('/search', [StoreController::class, 'search']);
+        Route::get('/', [StoreController::class, 'index']);
+        Route::post('/', [StoreController::class, 'store']);
+        Route::get('/{store}', [StoreController::class, 'show']);
+        Route::put('/{store}', [StoreController::class, 'update']);
+        Route::delete('/{store}', [StoreController::class, 'destroy']);
+    });
+
 
     Route::prefix('customers')->group(function () {
         Route::get('search', [CustomerController::class, 'search']);
@@ -139,3 +205,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::apiResource('logs', LogController::class)->only(['index', 'show']);
 });
+
+Route::get('reset', [SettingController::class, 'reset']);
+Route::get('seed', [SettingController::class, 'seed']);

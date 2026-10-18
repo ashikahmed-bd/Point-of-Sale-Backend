@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('return_items', function (Blueprint $table) {
+        Schema::create('sale_return_items', function (Blueprint $table) {
             $table->ulid('id')->primary();
 
             $table->foreignUlid('sale_return_id')->constrained()->cascadeOnDelete();
@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('refund_amount', 15, 2);
 
             $table->text('reason')->nullable();
-
             $table->timestamps();
         });
     }
@@ -35,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('return_items');
+        Schema::dropIfExists('sale_return_items');
     }
 };
