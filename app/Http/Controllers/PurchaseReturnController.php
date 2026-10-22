@@ -18,9 +18,7 @@ class PurchaseReturnController extends Controller
         $purchaseReturns = PurchaseReturn::query()
             ->with([
                 'purchase',
-                'supplier',
                 'items.product',
-                'items.variant',
             ])
             ->when($request->input('search'), function ($query, $search) {
                 $query->where(function ($q) use ($search) {
@@ -81,16 +79,14 @@ class PurchaseReturnController extends Controller
                 'discount' => $request->input('discount', 0),
                 'tax' => $request->input('tax', 0),
                 'shipping' => $request->input('shipping', 0),
-                'other_charge' => $request->input('other_charge', 0),
+                'charge' => $request->input('charge', 0),
                 'total' => $request->input('total', 0),
 
-                'currency' => $request->input(
-                    'currency',
-                    $purchase->currency ?? config('app.currency', 'BDT')
-                ),
+                'currency' => $request->input('currency', $purchase->currency),
 
                 'status' => 'draft',
                 'note' => $request->input('note'),
+                'created_by' => $request->user()?->id,
             ]);
 
             foreach ($request->input('items', []) as $item) {
@@ -127,8 +123,7 @@ class PurchaseReturnController extends Controller
     {
         return PurchaseReturnResource::make($purchaseReturn->load([
             'purchase',
-            'supplier',
-            'items',
+            'items.product',
         ]));
     }
 

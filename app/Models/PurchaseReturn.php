@@ -36,6 +36,26 @@ class PurchaseReturn extends Model
                 $model->return_no = Prefix::PURCHASE_RETURN->value
                     . '-' . now()->format('Ymd-His');
             }
+
+            $model->total = max(
+                0,
+                (float) ($model->subtotal ?? 0)
+                    - (float) ($model->discount ?? 0)
+                    + (float) ($model->tax ?? 0)
+                    + (float) ($model->shipping ?? 0)
+                    + (float) ($model->charge ?? 0)
+            );
+        });
+
+        static::saving(function ($model) {
+            $model->total = max(
+                0,
+                (float) $model->subtotal
+                    - (float) $model->discount
+                    + (float) $model->tax
+                    + (float) $model->shipping
+                    + (float) $model->charge
+            );
         });
     }
 }

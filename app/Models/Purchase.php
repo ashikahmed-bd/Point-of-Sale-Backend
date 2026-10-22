@@ -58,5 +58,16 @@ class Purchase extends Model
                 $model->purchase_no = Prefix::PURCHASE->value . '-' . now()->format('Ymd-His');
             }
         });
+
+        static::saving(function ($model) {
+            $model->total = max(
+                0,
+                (float) $model->subtotal
+                    - (float) $model->discount
+                    + (float) $model->tax
+                    + (float) $model->shipping
+                    + (float) $model->charge
+            );
+        });
     }
 }
