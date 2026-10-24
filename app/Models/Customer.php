@@ -16,4 +16,9 @@ class Customer extends Model
         'credit_limit' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    public function sales()
+    {
+        return $this->hasMany(Sale::class);
+    }
 }

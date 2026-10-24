@@ -58,7 +58,7 @@ class SaleResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-            'items_count' => $this->items_count,
+            'items_count' => $this->whenCounted('items'),
 
             'items' => SaleItemResource::collection(
                 $this->whenLoaded('items')

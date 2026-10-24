@@ -182,9 +182,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('search', [CustomerController::class, 'search']);
         Route::get('/', [CustomerController::class, 'index']);
         Route::post('/', [CustomerController::class, 'store']);
-        Route::get('customers/{customer}', [CustomerController::class, 'show']);
-        Route::put('customers/{customer}', [CustomerController::class, 'update']);
-        Route::delete('customers/{customer}', [CustomerController::class, 'destroy']);
+        Route::get('{customer}', [CustomerController::class, 'show']);
+        Route::put('{customer}', [CustomerController::class, 'update']);
+        Route::delete('{customer}', [CustomerController::class, 'destroy']);
+
+        Route::get('{customer}/sales', [CustomerController::class, 'sales']);
     });
 
     Route::apiResource('expense-categories', ExpenseCategoryController::class);

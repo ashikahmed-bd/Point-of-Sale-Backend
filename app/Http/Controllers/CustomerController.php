@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\CustomerRequest;
 use App\Http\Resources\CustomerResource;
+use App\Http\Resources\SaleResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 
@@ -62,7 +63,17 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
-        return CustomerResource::make($customer);
+        $customer->loadCount('sales');
+        $customer->load('sales');
+
+        return CustomerResource::make($customer)->additional([
+            'summary' => [
+                'credit_limit' => (float) $customer->credit_limit,
+                'outstanding_balance' => (float) $customer->sales->sum('due_amount'),
+                'total_spent' => (float) $customer->sales->sum('total'),
+                'total_orders' => $customer->sales->count(),
+            ],
+        ]);
     }
 
     /**
@@ -121,5 +132,16 @@ class CustomerController extends Controller
             ->get();
 
         return CustomerResource::collection($customers);
+    }
+
+    public function sales(Customer $customer)
+    {
+
+        return SaleResource::collection(
+            $customer->sales()
+                ->withCount('items')
+                ->latest()
+                ->paginate(10)
+        );
     }
 }
