@@ -25,7 +25,7 @@ return new class extends Migration
             $table->string('state')->nullable();
             $table->string('postcode', 20)->nullable();
 
-            $table->decimal('opening_balance', 15, 2)->default(0);
+            $table->decimal('balance', 15, 2)->default(0);
             $table->decimal('credit_limit', 15, 2)->nullable();
 
             $table->text('notes')->nullable();

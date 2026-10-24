@@ -66,12 +66,12 @@ class SupplierSeeder extends Seeder
             ],
         ];
 
-        foreach ($suppliers as $key => $supplier) {
+        foreach ($suppliers as $supplier) {
             Supplier::query()->create(
                 array_merge($supplier, [
-                    'opening_balance' => 0,
+                    'balance' => fake()->numberBetween(1000, 5000),
                     'credit_limit' => null,
-                    'notes' => null,
+                    'notes' => 'Regular supplier for computer accessories and IT products. Payment terms: 30 days credit. Contact before placing bulk orders.',
                     'is_active' => true,
                 ])
             );

@@ -29,7 +29,14 @@ class SupplierController extends Controller
             ->latest()
             ->paginate($request->integer('limit', 20));
 
-        return SupplierResource::collection($suppliers);
+        return SupplierResource::collection($suppliers)->additional([
+            'summary' => [
+                'total' => Supplier::count(),
+                'active' => Supplier::where('is_active', true)->count(),
+                'inactive' => Supplier::where('is_active', false)->count(),
+                'total_balance' => Supplier::sum('balance'),
+            ],
+        ]);
     }
 
     /**
@@ -46,7 +53,7 @@ class SupplierController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'postcode' => $request->postcode,
-            'opening_balance' => $request->opening_balance ?? 0,
+            'balance' => $request->balance ?? 0,
             'credit_limit' => $request->credit_limit,
             'notes' => $request->notes,
             'is_active' => $request->is_active ?? true,
@@ -63,7 +70,14 @@ class SupplierController extends Controller
      */
     public function show(Supplier $supplier)
     {
-        return SupplierResource::make($supplier);
+        return SupplierResource::make($supplier)->additional([
+            'summary' => [
+                'total_purchases' => (float) $supplier->purchases->sum('total'),
+                'total_paid' => (float) $supplier->purchases->sum('paid_amount'),
+                'outstanding_balance' => (float) $supplier->purchases->sum('due_amount'),
+                'total_count' => $supplier->purchases->count(),
+            ],
+        ]);
     }
 
     /**
@@ -80,7 +94,7 @@ class SupplierController extends Controller
             'city' => $request->city,
             'state' => $request->state,
             'postcode' => $request->postcode,
-            'opening_balance' => $request->opening_balance ?? $supplier->opening_balance,
+            'balance' => $request->balance ?? $supplier->balance,
             'credit_limit' => $request->credit_limit,
             'notes' => $request->notes,
             'is_active' => $request->is_active ?? $supplier->is_active,
@@ -123,5 +137,30 @@ class SupplierController extends Controller
             ->get();
 
         return SupplierResource::collection($suppliers);
+    }
+
+
+    public function enable(Supplier $supplier)
+    {
+        $supplier->update([
+            'is_active' => true,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Supplier enabled successfully.',
+        ]);
+    }
+
+    public function disable(Supplier $supplier)
+    {
+        $supplier->update([
+            'is_active' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Supplier disabled successfully.',
+        ]);
     }
 }

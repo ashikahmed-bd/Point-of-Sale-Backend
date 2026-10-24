@@ -70,7 +70,7 @@ class SupplierRequest extends FormRequest
                 'max:20',
             ],
 
-            'opening_balance' => [
+            'balance' => [
                 'nullable',
                 'numeric',
                 'min:0',

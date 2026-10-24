@@ -16,4 +16,9 @@ class Supplier extends Model
         'credit_limit' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    public function purchases()
+    {
+        return $this->hasMany(Purchase::class);
+    }
 }

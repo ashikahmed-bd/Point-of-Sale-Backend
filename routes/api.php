@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BrandController;
@@ -10,7 +10,6 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\LogController;
-use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\PurchaseReturnController;
@@ -21,11 +20,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaxController;
-use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VariantController;
-use App\Http\Controllers\WarehouseController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -150,14 +146,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     });
 
 
-    Route::apiResource('accounts', AccountController::class);
-    Route::apiResource('transactions', TransactionController::class);
-    Route::apiResource('payments', PaymentController::class);
-    Route::apiResource('expenses', ExpenseController::class);
-
-    Route::apiResource('variants', VariantController::class);
-    Route::apiResource('warehouses', WarehouseController::class);
-
     Route::prefix('suppliers')->group(function () {
         Route::get('/search', [SupplierController::class, 'search']);
         Route::get('/', [SupplierController::class, 'index']);
@@ -165,16 +153,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{supplier}', [SupplierController::class, 'show']);
         Route::put('/{supplier}', [SupplierController::class, 'update']);
         Route::delete('/{supplier}', [SupplierController::class, 'destroy']);
-    });
-
-
-    Route::prefix('stores')->group(function () {
-        Route::get('/search', [StoreController::class, 'search']);
-        Route::get('/', [StoreController::class, 'index']);
-        Route::post('/', [StoreController::class, 'store']);
-        Route::get('/{store}', [StoreController::class, 'show']);
-        Route::put('/{store}', [StoreController::class, 'update']);
-        Route::delete('/{store}', [StoreController::class, 'destroy']);
+        Route::patch('/{supplier}/enable', [SupplierController::class, 'enable']);
+        Route::patch('/{supplier}/disable', [SupplierController::class, 'disable']);
     });
 
 
@@ -189,18 +169,59 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('{customer}/sales', [CustomerController::class, 'sales']);
     });
 
-    Route::apiResource('expense-categories', ExpenseCategoryController::class);
-    Route::apiResource('expenses', ExpenseController::class);
-
-    Route::prefix('reports')->group(function () {
-        Route::get('accounts', [ReportController::class, 'index']);
-        Route::get('accounts/summary', [ReportController::class, 'summary']);
-        Route::get('accounts/transactions', [ReportController::class, 'transactions']);
+    Route::prefix('stores')->group(function () {
+        Route::get('/search', [StoreController::class, 'search']);
+        Route::get('/', [StoreController::class, 'index']);
+        Route::post('/', [StoreController::class, 'store']);
+        Route::get('/{store}', [StoreController::class, 'show']);
+        Route::put('/{store}', [StoreController::class, 'update']);
+        Route::delete('/{store}', [StoreController::class, 'destroy']);
     });
 
-    Route::apiResource('users', UserController::class);
+    Route::prefix('expenses')->group(function () {
+        Route::prefix('categories')->group(function () {
+            Route::get('/search', [ExpenseCategoryController::class, 'search']);
+            Route::get('/', [ExpenseCategoryController::class, 'index']);
+            Route::post('/', [ExpenseCategoryController::class, 'store']);
+            Route::get('/{expenseCategory}', [ExpenseCategoryController::class, 'show']);
+            Route::put('/{expenseCategory}', [ExpenseCategoryController::class, 'update']);
+            Route::delete('/{expenseCategory}', [ExpenseCategoryController::class, 'destroy']);
+        });
 
-    Route::apiResource('stores', StoreController::class);
+        Route::get('/', [ExpenseController::class, 'index']);
+        Route::post('/', [ExpenseController::class, 'store']);
+        Route::get('/{expense}', [ExpenseController::class, 'show']);
+        Route::put('/{expense}', [ExpenseController::class, 'update']);
+        Route::delete('/{expense}', [ExpenseController::class, 'destroy']);
+    });
+
+    Route::prefix('accounting')->group(function () {
+        Route::get('/', [AccountingController::class, 'overview']);
+        Route::get('accounts', [AccountingController::class, 'accounts']);
+        Route::get('transactions', [AccountingController::class, 'transactions']);
+        Route::get('cash-flow', [AccountingController::class, 'cashFlow']);
+        Route::get('profit-loss', [AccountingController::class, 'profitLoss']);
+        Route::get('balance-sheet', [AccountingController::class, 'balanceSheet']);
+    });
+
+    Route::prefix('reports')->group(function () {
+        Route::get('sales', [ReportController::class, 'sales']);
+        Route::get('purchases', [ReportController::class, 'purchases']);
+        Route::get('inventory', [ReportController::class, 'inventory']);
+        Route::get('customers', [ReportController::class, 'customers']);
+        Route::get('suppliers', [ReportController::class, 'suppliers']);
+        Route::get('expenses', [ReportController::class, 'expenses']);
+    });
+
+    Route::prefix('users')->group(function () {
+        Route::get('search', [UserController::class, 'search']);
+        Route::get('/', [UserController::class, 'index']);
+        Route::post('/', [UserController::class, 'store']);
+        Route::get('{user}', [UserController::class, 'show']);
+        Route::put('{user}', [UserController::class, 'update']);
+        Route::delete('{user}', [UserController::class, 'destroy']);
+    });
+
 
     Route::get('settings', [SettingController::class, 'index']);
     Route::put('settings', [SettingController::class, 'update']);
