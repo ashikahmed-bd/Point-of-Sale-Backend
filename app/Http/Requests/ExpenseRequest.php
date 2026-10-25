@@ -26,28 +26,12 @@ class ExpenseRequest extends FormRequest
         return [
             'store_id' => ['required', 'exists:stores,id'],
             'category_id' => ['required', 'exists:expense_categories,id'],
-            'expense_no' => ['nullable', 'string', 'max:255', Rule::unique('expenses', 'expense_no')->ignore($this->route('expense')?->id)],
-            'amount' => [
-                'required',
-                'numeric',
-                'min:0.01',
-            ],
+            'account_id' => ['required', 'exists:accounts,id'],
 
-            'expense_date' => [
-                'required',
-                'date',
-            ],
-
-            'payment_method' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'description' => [
-                'nullable',
-                'string',
-            ],
+            'amount' => ['required', 'numeric', 'min:0.01',],
+            'expense_date' => ['required', 'date'],
+            'reference' => ['nullable', 'string'],
+            'description' => ['nullable', 'string'],
         ];
     }
 }

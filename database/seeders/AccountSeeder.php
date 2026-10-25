@@ -21,9 +21,9 @@ class AccountSeeder extends Seeder
 
         $store->accounts()->create([
             'name' => 'Cash',
-            'account_no' => null,
-            'bank_name' => null,
-            'branch_name' => null,
+            'number' => null,
+            'bank' => null,
+            'branch' => null,
             'opening_balance' => 0,
             'current_balance' => 0,
             'is_default' => true,

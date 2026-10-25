@@ -101,4 +101,27 @@ class AccountController extends Controller
             'message' => 'Account deleted successfully.',
         ]);
     }
+
+    public function search(Request $request)
+    {
+        $accounts = Account::query()
+            ->when($request->input('keywords'), function ($query, $keywords) {
+                $query->where(function ($q) use ($keywords) {
+                    $q->where('name', 'like', "%{$keywords}%")
+                        ->orWhere('number', 'like', "%{$keywords}%")
+                        ->orWhere('name', 'like', "%{$keywords}%");
+                });
+            })
+            ->when($request->input('type'), function ($query, $type) {
+                $query->where('type', $type);
+            })
+            ->when($request->has('active'), function ($query) use ($request) {
+                $query->where('active', $request->boolean('active'));
+            })
+            ->orderBy('name')
+            ->limit(10)
+            ->get();
+
+        return AccountResource::collection($accounts);
+    }
 }

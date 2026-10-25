@@ -22,7 +22,7 @@ class ExpenseCategoryController extends Controller
                 $query->where('is_active', $request->boolean('is_active'));
             })
             ->latest()
-            ->paginate($request->integer('limit', 20));
+            ->paginate($request->integer('limit', 10));
 
         return ExpenseCategoryResource::collection($expenseCategories);
     }
@@ -40,7 +40,7 @@ class ExpenseCategoryController extends Controller
 
         return ExpenseCategoryResource::make($expenseCategory->refresh())->additional([
             'success' => true,
-            'message' => 'Expense category created successfully.',
+            'message' => 'Category created successfully.',
         ]);
     }
 
@@ -65,7 +65,7 @@ class ExpenseCategoryController extends Controller
 
         return ExpenseCategoryResource::make($expenseCategory->refresh())->additional([
             'success' => true,
-            'message' => 'Expense category updated successfully.',
+            'message' => 'Category updated successfully.',
         ]);
     }
 
@@ -74,11 +74,22 @@ class ExpenseCategoryController extends Controller
      */
     public function destroy(ExpenseCategory $expenseCategory)
     {
+        if ($expenseCategory->expenses()->exists()) {
+            $expenseCategory->update([
+                'is_active' => false,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Category is already used in expenses and has been deactivated.',
+            ]);
+        }
+
         $expenseCategory->delete();
 
         return response()->json([
             'success' => true,
-            'message' => 'Expense category deleted successfully.',
+            'message' => 'Category deleted successfully.',
         ]);
     }
 }

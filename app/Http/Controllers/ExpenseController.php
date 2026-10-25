@@ -28,17 +28,15 @@ class ExpenseController extends Controller
             ->when($request->store_id, function ($query, $storeId) {
                 $query->where('store_id', $storeId);
             })
-            ->when($request->payment_method, function ($query, $paymentMethod) {
-                $query->where('payment_method', $paymentMethod);
-            })
+
             ->when($request->from_date, function ($query, $date) {
                 $query->whereDate('expense_date', '>=', $date);
             })
             ->when($request->to_date, function ($query, $date) {
                 $query->whereDate('expense_date', '<=', $date);
             })
-            ->latest('expense_date')
-            ->paginate($request->integer('limit', 20));
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->integer('limit', 10));
 
         return ExpenseResource::collection($expenses);
     }
@@ -49,12 +47,13 @@ class ExpenseController extends Controller
     public function store(ExpenseRequest $request)
     {
         $expense = Expense::create([
-            'store_id' => $request->store_id,
-            'category_id' => $request->category_id,
-            'amount' => $request->amount,
-            'expense_date' => $request->expense_date,
-            'payment_method' => $request->payment_method,
-            'description' => $request->description,
+            'store_id' => $request->input('store_id'),
+            'category_id' => $request->input('category_id'),
+            'account_id' => $request->input('account_id'),
+            'amount' => $request->input('amount'),
+            'expense_date' => $request->input('expense_date'),
+            'reference' => $request->input('reference'),
+            'description' => $request->input('description'),
             'created_by' => $request->user()?->id,
         ]);
 

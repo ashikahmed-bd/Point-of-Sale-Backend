@@ -17,10 +17,9 @@ return new class extends Migration
             $table->foreignUlid('store_id')->constrained()->cascadeOnDelete();
 
             $table->string('name');
-
-            $table->string('account_no')->nullable();
-            $table->string('bank_name')->nullable();
-            $table->string('branch_name')->nullable();
+            $table->string('number')->nullable();
+            $table->string('bank')->nullable();
+            $table->string('branch')->nullable();
 
             $table->decimal('opening_balance', 15, 2)->default(0);
             $table->decimal('current_balance', 15, 2)->default(0);

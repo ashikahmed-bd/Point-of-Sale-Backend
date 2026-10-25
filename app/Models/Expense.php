@@ -49,7 +49,7 @@ class Expense extends Model
     {
         static::creating(function ($expense) {
             if (!$expense->expense_no) {
-                $expense->expense_no = 'EXP-' . now()->format('YmdHis') . '-' . strtoupper(Str::random(4));
+                $expense->expense_no = 'EXP-' . now()->format('Ymd-His');
             }
         });
     }

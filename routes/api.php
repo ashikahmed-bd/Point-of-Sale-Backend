@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountingController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
@@ -197,8 +198,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('accounting')->group(function () {
         Route::get('/', [AccountingController::class, 'overview']);
-        Route::get('accounts', [AccountingController::class, 'accounts']);
+
+        Route::prefix('accounts')->group(function () {
+            Route::get('/search', [AccountController::class, 'search']);
+            Route::get('/', [AccountController::class, 'index']);
+            Route::post('/', [AccountController::class, 'store']);
+            Route::get('/{account}', [AccountController::class, 'show']);
+            Route::put('/{account}', [AccountController::class, 'update']);
+            Route::delete('/{account}', [AccountController::class, 'destroy']);
+        });
+
         Route::get('transactions', [AccountingController::class, 'transactions']);
+
         Route::get('cash-flow', [AccountingController::class, 'cashFlow']);
         Route::get('profit-loss', [AccountingController::class, 'profitLoss']);
         Route::get('balance-sheet', [AccountingController::class, 'balanceSheet']);

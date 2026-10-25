@@ -16,16 +16,18 @@ return new class extends Migration
 
             $table->foreignUlid('store_id')->constrained()->cascadeOnDelete();
             $table->foreignUlid('category_id')->constrained('expense_categories')->restrictOnDelete();
+            $table->foreignUlid('account_id')
+                ->nullable()
+                ->constrained('accounts')
+                ->nullOnDelete();
 
-            $table->string('expense_no')->unique();
+            $table->string('expense_no')->nullable();
 
             $table->decimal('amount', 15, 2);
             $table->char('currency', 3)->default(config('app.currency'));
 
             $table->dateTime('expense_date');
-
-            $table->string('payment_method');
-
+            $table->string('reference')->nullable();
             $table->text('description')->nullable();
 
             $table->foreignUlid('created_by')->nullable()

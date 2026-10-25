@@ -30,6 +30,9 @@ class DatabaseSeeder extends Seeder
             SupplierSeeder::class,
             PurchaseSeeder::class,
             CustomerSeeder::class,
+
+            ExpenseCategorySeeder::class,
+            ExpenseSeeder::class,
         ]);
     }
 }
