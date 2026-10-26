@@ -20,7 +20,7 @@ class Brand extends Model
     public function getLogoUrlAttribute(): string
     {
         if (empty($this->logo)) {
-            return asset('/assets/categories/default.svg');
+            return asset('/assets/brands/logo.svg');
         }
 
         return Storage::disk($this->disk)->url($this->logo);

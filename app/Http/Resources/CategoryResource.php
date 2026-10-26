@@ -18,7 +18,10 @@ class CategoryResource extends JsonResource
 
         return [
             'id' => $this->id,
-            'parent_id' => $this->parent_id,
+            'parent' => $this->whenLoaded('parent', fn() => [
+                'id' => $this->parent->id,
+                'name' => $this->parent->name,
+            ]),
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
@@ -26,15 +29,13 @@ class CategoryResource extends JsonResource
             'sort_order' => $this->sort_order,
             'is_active' => $this->is_active,
 
-            'products_count' => $this->products_count,
-
-            'parent' => $this->whenLoaded('parent', fn() => [
-                'id' => $this->parent->id,
-                'name' => $this->parent->name,
-            ]),
-
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+
+            'products_count' => $this->whenCounted('products'),
+            'children' => CategoryResource::collection(
+                $this->whenLoaded('children')
+            ),
         ];
     }
 }

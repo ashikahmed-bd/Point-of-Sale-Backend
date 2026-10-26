@@ -137,8 +137,16 @@ class CategoryController extends Controller
     public function search(Request $request)
     {
         $categories = Category::query()
-            ->select('id', 'name')
+            ->whereNull('parent_id')
             ->where('is_active', true)
+            ->with([
+                'children' => function ($query) {
+                    $query->where('is_active', true)
+                        ->withCount('products')
+                        ->orderBy('name');
+                }
+            ])
+            ->withCount('products')
             ->when($request->search, function ($query, $search) {
                 $query->where('name', 'like', "%{$search}%");
             })
