@@ -22,11 +22,6 @@ return new class extends Migration
                 ->constrained('products')
                 ->restrictOnDelete();
 
-            $table->foreignUlid('variant_id')
-                ->nullable()
-                ->constrained('variants')
-                ->nullOnDelete();
-
             $table->unsignedInteger('quantity');
 
             $table->decimal('unit_cost', 15, 2)->default(0);

@@ -51,7 +51,6 @@ class PurchaseSeeder extends Seeder
 
             $item = $purchase->items()->create([
                 'product_id' => $product->id,
-                'variant_id' => null,
                 'quantity' => $quantity,
                 'unit_cost' => $unitCost,
                 'discount' => $discount,
@@ -64,7 +63,6 @@ class PurchaseSeeder extends Seeder
             for ($i = 0; $i < $quantity; $i++) {
                 $product->serials()->create([
                     'store_id' => $purchase->store_id,
-                    'variant_id' => $item->variant_id,
                     'purchase_item_id' => $item->id,
 
                     'serial_number' => fake()->unique()->bothify('SN-##########'),

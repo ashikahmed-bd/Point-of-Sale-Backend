@@ -38,10 +38,6 @@ class SerialResource extends JsonResource
                 $this->whenLoaded('product')
             ),
 
-            'variant' => VariantResource::make(
-                $this->whenLoaded('variant')
-            ),
-
             'purchase_item' => PurchaseItemResource::make(
                 $this->whenLoaded('purchaseItem')
             ),

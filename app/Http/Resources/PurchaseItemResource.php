@@ -20,7 +20,6 @@ class PurchaseItemResource extends JsonResource
             'id' => $this->id,
             'purchase' => $this->whenLoaded('purchase'),
             'product' => $this->whenLoaded('product'),
-            'variant' => $this->whenLoaded('variant'),
 
             'name' => $this->name,
             'sku' => $this->sku,

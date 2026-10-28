@@ -26,9 +26,6 @@ class PurchaseReturnItemResource extends JsonResource
                 $this->whenLoaded('product')
             ),
 
-            'variant' => VariantResource::make(
-                $this->whenLoaded('variant')
-            ),
 
             'quantity' => $this->quantity,
             'unit_cost' => $this->unit_cost,

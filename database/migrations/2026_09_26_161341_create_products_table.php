@@ -37,7 +37,6 @@ return new class extends Migration
             $table->boolean('track_serial')->default(false);
 
             $table->boolean('allow_backorder')->default(false);
-            $table->boolean('has_variants')->default(false);
 
             $table->string('status')->default('active');
 

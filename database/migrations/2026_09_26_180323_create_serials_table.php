@@ -22,11 +22,6 @@ return new class extends Migration
                 ->constrained()
                 ->restrictOnDelete();
 
-            $table->foreignUlid('variant_id')
-                ->nullable()
-                ->constrained('variants')
-                ->nullOnDelete();
-
             $table->foreignUlid('purchase_item_id')
                 ->nullable()
                 ->constrained('purchase_items')

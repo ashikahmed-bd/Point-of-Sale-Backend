@@ -2,14 +2,17 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AccountingController;
+use App\Http\Controllers\AdjustmentController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BarcodeController;
 use App\Http\Controllers\BrandController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchaseController;
@@ -21,6 +24,7 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaxController;
+use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -82,6 +86,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::prefix('products')->group(function () {
         Route::get('/search', [ProductController::class, 'search']);
+        Route::get('barcode', [ProductController::class, 'byBarcode']);
         Route::get('/', [ProductController::class, 'index']);
         Route::post('/', [ProductController::class, 'store']);
         Route::get('/{product}', [ProductController::class, 'show']);
@@ -194,6 +199,40 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('/{expense}', [ExpenseController::class, 'show']);
         Route::put('/{expense}', [ExpenseController::class, 'update']);
         Route::delete('/{expense}', [ExpenseController::class, 'destroy']);
+    });
+
+    Route::prefix('inventory')->group(function () {
+
+        // Low Stock
+        Route::get('low-stock', [InventoryController::class, 'lowStock']);
+
+        // Stock Adjustments
+        Route::get('adjustments', [AdjustmentController::class, 'index']);
+        Route::post('adjustments', [AdjustmentController::class, 'store']);
+        Route::get('adjustments/{adjustment}', [AdjustmentController::class, 'show']);
+        Route::put('adjustments/{adjustment}', [AdjustmentController::class, 'update']);
+        Route::delete('adjustments/{adjustment}', [AdjustmentController::class, 'destroy']);
+
+        // Stock Transfers
+        Route::get('transfers', [TransferController::class, 'index']);
+        Route::post('transfers', [TransferController::class, 'store']);
+        Route::get('transfers/{transfer}', [TransferController::class, 'show']);
+        Route::put('transfers/{transfer}', [TransferController::class, 'update']);
+        Route::delete('transfers/{transfer}', [TransferController::class, 'destroy']);
+
+        // Units
+        Route::get('units', [UnitController::class, 'index']);
+        Route::post('units', [UnitController::class, 'store']);
+        Route::get('units/{unit}', [UnitController::class, 'show']);
+        Route::put('units/{unit}', [UnitController::class, 'update']);
+        Route::delete('units/{unit}', [UnitController::class, 'destroy']);
+
+        // barcodes
+        Route::get('barcodes', [BarcodeController::class, 'index']);
+        Route::post('barcodes', [BarcodeController::class, 'store']);
+        Route::get('barcodes/{product}', [BarcodeController::class, 'show']);
+        Route::put('barcodes/{product}', [BarcodeController::class, 'update']);
+        Route::delete('barcodes/{product}', [BarcodeController::class, 'destroy']);
     });
 
     Route::prefix('accounting')->group(function () {

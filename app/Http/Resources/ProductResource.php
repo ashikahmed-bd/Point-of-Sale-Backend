@@ -70,39 +70,6 @@ class ProductResource extends JsonResource
                 'name' => $this->unit->name,
             ]),
 
-            'options' => $this->whenLoaded(
-                'variants',
-                fn() =>
-                collect(
-                    $this->variants
-                        ->pluck('options')
-                        ->filter()
-                        ->reduce(function ($result, $options) {
-                            foreach ($options as $name => $value) {
-                                $result[$name] ??= [];
-
-                                if (! in_array($value, $result[$name], true)) {
-                                    $result[$name][] = $value;
-                                }
-                            }
-
-                            return $result;
-                        }, [])
-                )
-                    ->map(fn($values, $name) => [
-                        'name' => $name,
-                        'options' => array_values($values),
-                    ])
-                    ->values()
-                    ->all()
-            ),
-
-            'variants_count' => $this->whenCounted('variants'),
-
-            'variants' => VariantResource::collection(
-                $this->whenLoaded('variants')
-            ),
-
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

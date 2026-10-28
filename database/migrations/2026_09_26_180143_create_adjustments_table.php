@@ -18,9 +18,10 @@ return new class extends Migration
 
             $table->string('adjustment_no')->unique();
 
-            $table->string('type');
-
-            $table->string('reason')->nullable();
+            $table->string('reference', 50)->unique();
+            $table->date('date');
+            $table->string('reason');
+            $table->text('notes')->nullable();
 
             $table->string('status')->default('completed');
 

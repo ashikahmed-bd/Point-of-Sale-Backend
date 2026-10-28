@@ -27,13 +27,6 @@ class CartItemResource extends JsonResource
                 'barcode' => $this->product->barcode,
                 'cover_url' => $this->product->cover_url,
             ]),
-            'variant' => $this->whenLoaded('variant', fn() => [
-                'id' => $this->variant->id,
-                'name' => $this->variant->name,
-                'sku' => $this->variant->sku,
-                'barcode' => $this->variant->barcode,
-                'image_url' => $this->variant->image_url,
-            ]),
 
             'name' => $this->name,
             'sku' => $this->sku,

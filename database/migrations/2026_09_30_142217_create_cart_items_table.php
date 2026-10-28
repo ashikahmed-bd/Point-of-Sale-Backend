@@ -22,11 +22,6 @@ return new class extends Migration
                 ->constrained('products')
                 ->restrictOnDelete();
 
-            $table->foreignUlid('variant_id')
-                ->nullable()
-                ->constrained('variants')
-                ->nullOnDelete();
-
             $table->string('name');
             $table->string('sku')->nullable();
 
@@ -46,7 +41,6 @@ return new class extends Migration
             $table->unique([
                 'cart_id',
                 'product_id',
-                'variant_id',
             ]);
         });
     }

@@ -16,14 +16,13 @@ return new class extends Migration
 
             $table->foreignUlid('adjustment_id')->constrained()->cascadeOnDelete();
             $table->foreignUlid('product_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('variant_id')->nullable()->constrained()->nullOnDelete();
 
-            $table->decimal('quantity', 15, 3);
+            $table->enum('type', ['increase', 'decrease', 'damaged', 'expired']);
 
-            $table->decimal('before_quantity', 15, 3);
+            $table->decimal('quantity', 12, 3);
             $table->decimal('after_quantity', 15, 3);
-
-            $table->text('note')->nullable();
+            $table->decimal('before_quantity', 15, 3);
+            $table->text('notes')->nullable();
 
             $table->timestamps();
         });

@@ -6,7 +6,6 @@ use App\Models\Serial;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Storage;
 
 class Product extends Model
@@ -24,7 +23,6 @@ class Product extends Model
         'sold_count' => 'integer',
         'track_stock' => 'boolean',
         'allow_backorder' => 'boolean',
-        'has_variants' => 'boolean',
     ];
 
     public function scopeSummary(Builder $query): Builder
@@ -44,7 +42,6 @@ class Product extends Model
             'stock',
             'track_serial',
             'sold_count',
-            'has_variants',
             'cover',
         ]);
     }
@@ -74,15 +71,6 @@ class Product extends Model
         return $this->belongsTo(User::class, 'created_by');
     }
 
-    public function options(): HasMany
-    {
-        return $this->hasMany(ProductOption::class);
-    }
-
-    public function variants(): HasMany
-    {
-        return $this->hasMany(Variant::class);
-    }
 
     public function serials()
     {

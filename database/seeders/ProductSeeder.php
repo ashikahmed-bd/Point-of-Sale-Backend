@@ -146,7 +146,6 @@ class ProductSeeder extends Seeder
                 'track_serial' => true,
 
                 'allow_backorder' => false,
-                'has_variants' => false,
 
                 'status' => 'active',
             ]));

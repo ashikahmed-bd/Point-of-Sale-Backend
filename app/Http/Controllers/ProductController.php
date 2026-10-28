@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Http\Resources\ProductSummaryResource;
+use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -94,8 +95,8 @@ class ProductController extends Controller
             'description' => $request->description,
 
             'cost_price' => $request->cost_price ?? 0,
-            'selling_price' => $request->selling_price,
-            'compare_price' => $request->compare_price,
+            'price' => $request->price,
+            'base_price' => $request->base_price,
 
             'stock' => $request->stock,
             'min_stock' => $request->min_stock ?? 0,
@@ -145,12 +146,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $product->load([
-            'variants',
-            'options.attribute',
-            'options.option',
-            'availableSerials',
-        ]);
+        $product->load(['availableSerials']);
 
         return ProductSummaryResource::make($product);
     }
@@ -169,15 +165,14 @@ class ProductController extends Controller
             'description' => $request->description,
 
             'cost_price' => $request->cost_price ?? 0,
-            'selling_price' => $request->selling_price,
-            'compare_price' => $request->compare_price,
+            'price' => $request->price,
+            'base_price' => $request->base_price,
 
             'min_stock' => $request->min_stock ?? 0,
             'max_stock' => $request->max_stock,
 
             'track_stock' => $request->track_stock ?? true,
             'allow_backorder' => $request->allow_backorder ?? false,
-            'has_variants' => $request->has_variants ?? false,
 
             'status' => $request->status ?? 'active',
 
@@ -214,12 +209,6 @@ class ProductController extends Controller
     {
         $products = Product::query()
             ->summary()
-            ->with([
-                'variants',
-                'options.attribute',
-                'options.option',
-            ])
-            ->withCount(['variants'])
             ->when($request->filled('keywords'), function ($query) use ($request) {
                 $query->where(function ($q) use ($request) {
                     $q->where('name', 'like', "%{$request->keywords}%")
@@ -229,7 +218,11 @@ class ProductController extends Controller
                 });
             })
             ->when($request->category_id, function ($query, $categoryId) {
-                $query->where('category_id', $categoryId);
+                $categoryIds = Category::where('id', $categoryId)
+                    ->orWhere('parent_id', $categoryId)
+                    ->pluck('id');
+
+                $query->whereIn('category_id', $categoryIds);
             })
             ->when($request->brand_id, function ($query, $brandId) {
                 $query->where('brand_id', $brandId);
@@ -239,5 +232,17 @@ class ProductController extends Controller
             ->get();
 
         return ProductSummaryResource::collection($products);
+    }
+
+
+    public function byBarcode(Request $request)
+    {
+        $request->validate([
+            'barcode' => ['required', 'string'],
+        ]);
+
+        $product = Product::where('barcode', $request->barcode)->firstOrFail();
+
+        return ProductResource::make($product);
     }
 }

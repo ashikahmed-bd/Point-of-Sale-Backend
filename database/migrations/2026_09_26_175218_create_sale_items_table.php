@@ -16,7 +16,6 @@ return new class extends Migration
 
             $table->foreignUlid('sale_id')->constrained()->cascadeOnDelete();
             $table->foreignUlid('product_id')->constrained()->restrictOnDelete();
-            $table->foreignUlid('variant_id')->nullable()->constrained()->nullOnDelete();
 
             $table->string('name');
             $table->string('sku');
