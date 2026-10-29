@@ -24,7 +24,6 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\TaxController;
-use App\Http\Controllers\TransferController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -212,13 +211,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::get('adjustments/{adjustment}', [AdjustmentController::class, 'show']);
         Route::put('adjustments/{adjustment}', [AdjustmentController::class, 'update']);
         Route::delete('adjustments/{adjustment}', [AdjustmentController::class, 'destroy']);
-
-        // Stock Transfers
-        Route::get('transfers', [TransferController::class, 'index']);
-        Route::post('transfers', [TransferController::class, 'store']);
-        Route::get('transfers/{transfer}', [TransferController::class, 'show']);
-        Route::put('transfers/{transfer}', [TransferController::class, 'update']);
-        Route::delete('transfers/{transfer}', [TransferController::class, 'destroy']);
 
         // Units
         Route::get('units', [UnitController::class, 'index']);

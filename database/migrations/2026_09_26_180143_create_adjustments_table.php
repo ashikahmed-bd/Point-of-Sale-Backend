@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('reason');
             $table->text('notes')->nullable();
 
-            $table->string('status')->default('completed');
+            $table->enum('status', ['draft', 'pending', 'completed', 'cancelled'])->default('completed');
 
             $table->foreignUlid('created_by')->nullable()
                 ->constrained('users')

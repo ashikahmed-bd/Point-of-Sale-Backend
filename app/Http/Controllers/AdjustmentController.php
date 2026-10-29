@@ -94,7 +94,7 @@ class AdjustmentController extends Controller
                 'date' => $request->date,
                 'reason' => $request->reason,
                 'notes' => $request->notes,
-                'status' => $request->status ?? 'completed',
+                'status' => $request->status,
                 'created_by' => $request->user()?->id,
             ]);
 
